@@ -1,4 +1,10 @@
-// In-Memory Database for Khaira Medical Chatbot
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DB_FILE = path.join(__dirname, 'live_db.json');
 
 export const SERVICES = [
     {
@@ -66,11 +72,40 @@ export const STAFF_POOL = [
     { id: 'STF-105', name: 'Priya Nair', role: 'ECG Specialist', category: 'ecg', phone: '+91 98765 43214', rating: 4.8, available: true, location: '302018' },
 ];
 
-export let BOOKINGS = [];
+function loadDB() {
+    try {
+        if (fs.existsSync(DB_FILE)) {
+            const raw = fs.readFileSync(DB_FILE, 'utf8');
+            const data = JSON.parse(raw);
+            return {
+                bookings: Array.isArray(data.bookings) ? data.bookings : [],
+                emergencyAlerts: Array.isArray(data.emergencyAlerts) ? data.emergencyAlerts : [],
+                liveMessages: Array.isArray(data.liveMessages) ? data.liveMessages : []
+            };
+        }
+    } catch (e) {
+        console.error('[DB Load Error]:', e.message);
+    }
+    return { bookings: [], emergencyAlerts: [], liveMessages: [] };
+}
 
-export let EMERGENCY_ALERTS = [];
+function saveDB() {
+    try {
+        const data = {
+            bookings: BOOKINGS,
+            emergencyAlerts: EMERGENCY_ALERTS,
+            liveMessages: LIVE_WHATSAPP_MESSAGES
+        };
+        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf8');
+    } catch (e) {
+        console.error('[DB Save Error]:', e.message);
+    }
+}
 
-export let LIVE_WHATSAPP_MESSAGES = [];
+const initialDB = loadDB();
+export let BOOKINGS = initialDB.bookings;
+export let EMERGENCY_ALERTS = initialDB.emergencyAlerts;
+export let LIVE_WHATSAPP_MESSAGES = initialDB.liveMessages;
 
 export const CONVERSATION_STATES = {};
 
@@ -95,11 +130,11 @@ export function addLiveWhatsAppMessage(phone, userMessage, botReplyText, display
         status: 'Auto Replied (WhatsApp Cloud API)'
     };
 
-    // Keep top 50 messages
     LIVE_WHATSAPP_MESSAGES.unshift(newMsg);
-    if (LIVE_WHATSAPP_MESSAGES.length > 50) {
+    if (LIVE_WHATSAPP_MESSAGES.length > 100) {
         LIVE_WHATSAPP_MESSAGES.pop();
     }
+    saveDB();
     return newMsg;
 }
 
@@ -125,6 +160,7 @@ export function addBooking(bookingData) {
     }
 
     BOOKINGS.unshift(newBooking);
+    saveDB();
     return newBooking;
 }
 
@@ -138,6 +174,7 @@ export function updateBookingStatus(id, newStatus, staffId = null) {
                 booking.assignedStaff = { id: staff.id, name: staff.name, phone: staff.phone };
             }
         }
+        saveDB();
         return booking;
     }
     return null;
@@ -151,5 +188,6 @@ export function addEmergencyAlert(alert) {
         ...alert
     };
     EMERGENCY_ALERTS.unshift(newAlert);
+    saveDB();
     return newAlert;
 }
