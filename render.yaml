@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: garments-retailing-erp-bot
+    name: healthcare-chatbot-bot
     env: node
     buildCommand: npm install && npm run build
     startCommand: node server.js
@@ -15,3 +15,5 @@ services:
         value: Digify_soft
       - key: META_VERIFY_TOKEN
         value: automatex_copilot_token
+
+
