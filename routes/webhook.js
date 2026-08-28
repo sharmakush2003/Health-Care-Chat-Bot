@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
         }
         return res.sendStatus(403);
     }
-    res.sendStatus(400);
+    res.sendStatus(200).send('Khaira Medical Webhook Listener Ready');
 });
 
 /**
@@ -40,17 +40,23 @@ router.get('/', (req, res) => {
  * Receives real incoming WhatsApp messages from Meta Cloud API or AutobotChat / Goshort
  */
 router.post('/', async (req, res) => {
+    console.log('[Incoming Webhook Payload]:', JSON.stringify(req.body));
+
+    // Fast-ack webhook request to prevent AutobotChat / Meta from timing out
+    res.status(200).json({ status: 'Processing' });
+
     try {
         // Deduplicate incoming webhooks using message ID
         const msgId = req.body.id || req.body.whts_ref_id || (req.body.context ? req.body.context.id : null);
         if (msgId && isDuplicateMessage(msgId)) {
-            console.log(`[Webhook] Skipped duplicate webhook payload for Message ID: ${msgId}`);
-            return res.status(200).json({ status: 'Ignored duplicate webhook' });
+            console.log(`[Webhook] Ignored duplicate webhook for Message ID: ${msgId}`);
+            return;
         }
 
         // Handle Delivery Status / Report Webhooks
         if (req.body.delivery_time || req.body.template_id || (req.body.status && !req.body.text && !req.body.message && !req.body.entry)) {
-            return res.status(200).json({ status: 'Report received' });
+            console.log('[Webhook] Status report received.');
+            return;
         }
 
         let senderPhone = null;
@@ -96,7 +102,7 @@ router.post('/', async (req, res) => {
                 }
             }
         } 
-        // 3. Fallback format (from / number / mobile)
+        // 3. Fallback format (from / number / mobile / phone)
         else if (req.body.from || req.body.number || req.body.mobile || req.body.phone) {
             senderPhone = req.body.from || req.body.number || req.body.mobile || req.body.phone;
             if (typeof req.body.text === 'object' && req.body.text !== null) {
@@ -108,11 +114,11 @@ router.post('/', async (req, res) => {
             }
         }
 
-        console.log(`[Incoming WhatsApp Webhook] From: ${senderPhone} | Message: "${messageText}"`);
+        console.log(`[Parsed Webhook Message] From: ${senderPhone} | Message: "${messageText}"`);
 
         if (!senderPhone || !messageText) {
-            console.log('[Webhook] Received status/ping payload or missing text.');
-            return res.status(200).json({ status: 'Acknowledged status payload' });
+            console.log('[Webhook] Missing senderPhone or message text in payload.');
+            return;
         }
 
         // Process message through Khaira Healthcare Engine
@@ -122,17 +128,11 @@ router.post('/', async (req, res) => {
         addLiveWhatsAppMessage(senderPhone, messageText, botResponse.text);
 
         // Dispatch Outbound WhatsApp message back to patient's real phone!
-        await sendWhatsAppMessage(senderPhone, botResponse);
+        const result = await sendWhatsAppMessage(senderPhone, botResponse);
+        console.log(`[Webhook Response Dispatch Result]:`, result);
 
-        return res.status(200).json({
-            status: 'success',
-            senderPhone,
-            userMessage: messageText,
-            botResponse
-        });
     } catch (error) {
-        console.error('[Webhook Receiver Error]:', error);
-        return res.status(500).json({ error: error.message });
+        console.error('[Webhook Processing Error]:', error);
     }
 });
 
