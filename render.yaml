@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: garments-retailing-erp-bot
+    name: garments-erp-bot
     env: node
     buildCommand: npm install && npm run build
     startCommand: node server.js
