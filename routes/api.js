@@ -1,18 +1,42 @@
 import express from 'express';
+import axios from 'axios';
 import { getBookings, updateBookingStatus, STAFF_POOL, EMERGENCY_ALERTS, SERVICES, getLiveMessages, addLiveWhatsAppMessage } from '../data/mockDatabase.js';
 import { processHealthcareMessage } from '../services/healthcareEngine.js';
 import { generateBookingPDF } from '../services/pdfGenerator.js';
 
 const router = express.Router();
+const RENDER_LIVE_URL = 'https://garments-erp-bot.onrender.com';
 
-// Get all bookings
-router.get('/bookings', (req, res) => {
-    res.json({ bookings: getBookings() });
+// Get all bookings (with fallback to live Render server if local DB is empty)
+router.get('/bookings', async (req, res) => {
+    let localBookings = getBookings();
+    if (localBookings.length === 0 && !process.env.RENDER) {
+        try {
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/bookings`, { timeout: 3000 });
+            if (remoteRes.data && Array.isArray(remoteRes.data.bookings) && remoteRes.data.bookings.length > 0) {
+                return res.json({ bookings: remoteRes.data.bookings });
+            }
+        } catch (e) {
+            // Ignore offline/timeout errors
+        }
+    }
+    res.json({ bookings: localBookings });
 });
 
-// Get live WhatsApp message feed
-router.get('/messages', (req, res) => {
-    res.json({ messages: getLiveMessages() });
+// Get live WhatsApp message feed (with fallback to live Render server if local DB is empty)
+router.get('/messages', async (req, res) => {
+    let localMessages = getLiveMessages();
+    if (localMessages.length === 0 && !process.env.RENDER) {
+        try {
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/messages`, { timeout: 3000 });
+            if (remoteRes.data && Array.isArray(remoteRes.data.messages) && remoteRes.data.messages.length > 0) {
+                return res.json({ messages: remoteRes.data.messages });
+            }
+        } catch (e) {
+            // Ignore offline/timeout errors
+        }
+    }
+    res.json({ messages: localMessages });
 });
 
 // Update booking status / staff
@@ -41,10 +65,22 @@ router.get('/emergency', (req, res) => {
     res.json({ alerts: EMERGENCY_ALERTS });
 });
 
-// Get Dashboard KPI Metrics
-router.get('/stats', (req, res) => {
+// Get Dashboard KPI Metrics (with fallback to live Render server)
+router.get('/stats', async (req, res) => {
     const bookings = getBookings();
     const messages = getLiveMessages();
+
+    if (messages.length === 0 && !process.env.RENDER) {
+        try {
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/stats`, { timeout: 3000 });
+            if (remoteRes.data && remoteRes.data.stats && remoteRes.data.stats.totalEnquiries > 0) {
+                return res.json({ stats: remoteRes.data.stats });
+            }
+        } catch (e) {
+            // Ignore offline/timeout errors
+        }
+    }
+
     const stats = {
         totalEnquiries: messages.length,
         todaysBookings: bookings.length,
@@ -75,12 +111,23 @@ router.get('/bookings/:id/invoice', async (req, res) => {
 });
 
 // Simulated WhatsApp Chat trigger for testing from dashboard
-router.post('/simulate-chat', (req, res) => {
+router.post('/simulate-chat', async (req, res) => {
     const { phone, message, payload } = req.body;
-    const userPhone = phone || '+91 90450 99111';
+    const userPhone = phone || '918233816674';
 
     const botReply = processHealthcareMessage(userPhone, message, payload);
-    addLiveWhatsAppMessage(userPhone, message, botReply.text);
+    const newMsg = addLiveWhatsAppMessage(userPhone, message, botReply.text, 'Patient (Test)');
+
+    // Also forward simulation to Render if running locally so Render stores it too!
+    if (!process.env.RENDER) {
+        try {
+            await axios.post(`${RENDER_LIVE_URL}/api/simulate-chat`, {
+                phone: userPhone,
+                message,
+                payload
+            }, { timeout: 3000 });
+        } catch (e) {}
+    }
 
     res.json({
         success: true,
