@@ -6,9 +6,8 @@ const EMERGENCY_KEYWORDS = [
 ];
 
 /**
- * Healthcare Conversation Engine
- * Implements the end-to-end 17-stage process flow for WhatsApp chatbot
- * Uses ultra-reliable WhatsApp Plain Text session messaging compatible with Meta Cloud API & AutobotChat
+ * Health Saathi WhatsApp Conversation Engine by AutomateX.co.in
+ * Formats ultra-aesthetic, highly structured, professional WhatsApp messages
  */
 export function processHealthcareMessage(userPhone, messageText, payloadData = null) {
     let cleanUserPhone = (userPhone || '').toString().replace(/\D/g, '');
@@ -28,7 +27,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
         return {
             type: 'TEXT',
-            text: `🚨 *URGENT MEDICAL NOTICE* 🚨\n\nIf the patient is experiencing an immediate life-threatening medical emergency (such as severe chest pain, loss of consciousness, or acute breathing distress):\n\n1️⃣ Please call **108 Emergency Ambulance** or reach the nearest Emergency Room (ER) immediately.\n2️⃣ Our Clinical & Medical Escalation Team has been alerted for this number (${userPhone}).\n\n*Our home healthcare services are for non-emergency home visits.*`
+            text: `🚨 *URGENT CLINICAL MEDICAL NOTICE* 🚨\n----------------------------------------\nIf the patient is experiencing an immediate life-threatening medical emergency (such as severe chest pain, loss of consciousness, or acute breathing distress):\n\n1️⃣ Please call **108 Emergency Ambulance** or reach the nearest Emergency Room (ER) immediately.\n2️⃣ Our Clinical & Medical Escalation Team has been alerted for this number (${userPhone}).\n----------------------------------------\n*Our home healthcare services are for non-emergency home visits.*`
         };
     }
 
@@ -52,7 +51,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             state.step = 'MAIN_MENU';
             return {
                 type: 'TEXT',
-                text: `👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\nWe provide professional doctor-guided home healthcare services directly at your doorstep.\n\n*How can we help you today? Please reply with a number (1 to 7):*\n\n1️⃣ *Nursing at Home* (₹800/visit or ₹1,500/12-hr)\n2️⃣ *Caretaker at Home* (₹1,200/12-hr or ₹2,000/24-hr)\n3️⃣ *Physiotherapy at Home* (₹900/45-min session)\n4️⃣ *Lab Test / Sample Collection* (Starts @ ₹500)\n5️⃣ *ECG at Home* (₹1,100 per test)\n6️⃣ *Pricing & Service Information*\n7️⃣ *Check Existing Booking Status*\n\nReply with option number (*1 to 7*) to proceed.`
+                text: `👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\n🩺 *Doctor-Guided Home Healthcare Services*\n----------------------------------------\nWe deliver certified nursing, physiotherapy, caretaker, and diagnostic services directly to your doorstep.\n\n📋 *HOW CAN WE HELP YOU TODAY?*\nPlease reply with a number (*1 to 7*) to select:\n\n1️⃣  *Nursing at Home*\n     └ ₹800 / visit  •  ₹1,500 / 12-hr shift\n\n2️⃣  *Caretaker at Home*\n     └ ₹1,200 / 12-hr  •  ₹2,000 / 24-hr\n\n3️⃣  *Physiotherapy at Home*\n     └ ₹900 / 45-min expert session\n\n4️⃣  *Lab Test / Sample Collection*\n     └ Starts @ ₹500  (Free home collection)\n\n5️⃣  *ECG at Home*\n     └ ₹1,100 / test (Instant digital report)\n\n6️⃣  *Full Tariff Card & Information*\n7️⃣  *Check Booking Status / Track Professional*\n----------------------------------------\n📲 *Reply with option number (1 to 7) to proceed*`
             };
         }
 
@@ -68,13 +67,13 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             else if (text === '6' || payloadData === 'OPT_PRICING') {
                 return {
                     type: 'TEXT',
-                    text: `💰 *Health Saathi Tariff Card (AutomateX.co.in)*\n\n1️⃣ *Nursing at Home*: ₹800 / visit or ₹1,500 / 12-hr shift\n2️⃣ *Caretaker at Home*: ₹1,200 / 12-hr or ₹2,000 / 24-hr\n3️⃣ *Physiotherapy at Home*: ₹900 / 45-min session\n4️⃣ *Lab Test / Sample Collection*: Starts @ ₹500\n5️⃣ *ECG at Home*: ₹1,100 / digital report\n\nReply with *1 to 5* to book a service or *0* for main menu.`
+                    text: `💰 *HEALTH SAATHI SERVICE TARIFF CARD*\n_AutomateX.co.in Healthcare Tariff_\n----------------------------------------\n1️⃣ *Nursing at Home*: ₹800 / visit or ₹1,500 / 12-hr shift\n2️⃣ *Caretaker at Home*: ₹1,200 / 12-hr or ₹2,000 / 24-hr\n3️⃣ *Physiotherapy at Home*: ₹900 / 45-min session\n4️⃣ *Lab Test / Sample Collection*: Starts @ ₹500\n5️⃣ *ECG at Home*: ₹1,100 / digital report\n----------------------------------------\nReply with *1 to 5* to book a service or *0* for main menu.`
                 };
             } else if (text === '7' || payloadData === 'OPT_STATUS') {
                 state.step = 'CHECK_STATUS';
                 return {
                     type: 'TEXT',
-                    text: `🔍 Please enter your **Booking ID** (e.g. *PH-10452* or *NS-10453*) to track your service & assigned professional.`
+                    text: `🔍 *CHECK BOOKING STATUS*\n----------------------------------------\nPlease enter your **Booking ID** (e.g. *PH-10452* or *NS-10453*) to track your assigned professional:`
                 };
             }
 
@@ -84,13 +83,13 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 state.step = 'CAPTURE_PINCODE';
                 return {
                     type: 'TEXT',
-                    text: `🩺 *Selected: ${service.name}*\n_${service.description}_\n\n💰 Price: ${service.priceDescription}\n\nPlease enter the **Pincode / Location** where the service is required (e.g., *302012*):`
+                    text: `🩺 *SELECTED SERVICE*: *${service.name}*\n_${service.description}_\n\n💰 *Tariff*: ${service.priceDescription}\n----------------------------------------\n📍 *STEP 1 OF 3: LOCATION PINCODE*\n\nPlease enter the **6-Digit Pincode** or Area Name where the service is required (e.g. *302012*):`
                 };
             }
 
             return {
                 type: 'TEXT',
-                text: `Invalid selection. Please reply with numbers *1 to 5* to select a service, *6* for tariff, or *7* to check booking status.`
+                text: `❌ *Invalid Selection*\n----------------------------------------\nPlease reply with numbers *1 to 5* to select a service, *6* for tariff card, or *7* to check booking status.`
             };
         }
 
@@ -101,7 +100,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `📍 Location recorded: *${state.data.pincode}*\n\n*When do you require the service?*\n\n1️⃣ *Today*\n2️⃣ *Tomorrow*\n3️⃣ *Select Later Date*\n\nReply with *1*, *2*, or type a specific date (e.g. *30 Aug*):`
+                text: `📍 *Location Recorded*: *${state.data.pincode}*\n----------------------------------------\n📅 *STEP 2 OF 3: PREFERRED DATE*\n\nWhen would you like the healthcare professional to visit?\n\n1️⃣ *Today*\n2️⃣ *Tomorrow*\n3️⃣ *Custom Date*\n----------------------------------------\n📲 *Reply 1 for Today, 2 for Tomorrow, or type a date (e.g. 30 Aug):*`
             };
         }
 
@@ -115,11 +114,11 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             state.step = 'SELECT_SLOT';
 
             const service = state.data.service || SERVICES[0];
-            let slotsText = `📅 Date: *${preferredDate}*\n\nPlease select your preferred time slot for **${service.name}**:\n\n`;
+            let slotsText = `📅 *Date Reserved*: *${preferredDate}*\n----------------------------------------\n🕘 *SELECT PREFERRED TIME SLOT* for **${service.name}**:\n\n`;
             service.slots.forEach((slot, idx) => {
                 slotsText += `${idx + 1}️⃣ *${slot}*\n`;
             });
-            slotsText += `\nReply with option number (*1 to ${service.slots.length}*) or type custom time.`;
+            slotsText += `----------------------------------------\n📲 *Reply with slot number (1 to ${service.slots.length}) or type custom time.*`;
 
             return {
                 type: 'TEXT',
@@ -146,7 +145,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `🕘 Slot reserved: *${slotName}*\n\nPlease enter the **Patient Name & Age** (e.g. *Rajesh Sharma, 58 yrs*):`
+                text: `🕘 *Time Slot Reserved*: *${slotName}*\n----------------------------------------\n👤 *STEP 3 OF 3: PATIENT DETAILS*\n\nPlease enter the **Patient Name & Age** (e.g. *Rajesh Sharma, 58 yrs*):`
             };
         }
 
@@ -159,7 +158,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `📋 *Booking Summary & Quotation*\n\n• **Service**: ${service.name}\n• **Patient Details**: ${text}\n• **Pincode**: ${state.data.pincode}\n• **Date & Slot**: ${state.data.date} @ ${state.data.slot}\n• **Estimated Charges**: ₹${price}\n\n*Would you like to confirm this booking?*\n\n1️⃣ *Confirm & Book*\n2️⃣ *Cancel*\n\nReply *1* to confirm or *2* to cancel.`
+                text: `📋 *HEALTH SAATHI BOOKING QUOTATION*\n----------------------------------------\n• *Service*: ${service.name}\n• *Patient*: ${text}\n• *Location Pincode*: ${state.data.pincode}\n• *Scheduled Visit*: ${state.data.date} @ ${state.data.slot}\n• *Estimated Charges*: *₹${price}*\n----------------------------------------\n*Would you like to confirm this booking?*\n\n1️⃣  ✅ *Confirm & Book Now*\n2️⃣  ❌ *Cancel*\n----------------------------------------\n📲 *Reply 1 to Confirm or 2 to Cancel.*`
             };
         }
 
@@ -182,11 +181,11 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 // Reset state
                 CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
 
-                const staffName = newBooking.assignedStaff ? newBooking.assignedStaff.name : 'Allocating nearby staff...';
+                const staffName = newBooking.assignedStaff ? `${newBooking.assignedStaff.name} (${newBooking.assignedStaff.phone})` : 'Allocating nearby specialist...';
 
                 return {
                     type: 'BOOKING_CONFIRMED',
-                    text: `✅ *BOOKING CONFIRMED*\n\n🆔 **Booking ID**: ${newBooking.id}\n📅 **Date**: ${newBooking.date}\n🕘 **Time Slot**: ${newBooking.slot}\n📍 **Location Pincode**: ${newBooking.pincode}\n👨‍⚕️ **Assigned Professional**: ${staffName}\n💰 **Total Amount**: ₹${newBooking.amount}\n💳 **Payment Status**: Pending (Pay on Service / Online UPI)\n\n📱 You will receive a WhatsApp reminder 1 hour before the visit.`,
+                    text: `✅ *BOOKING CONFIRMED & ALLOCATED*\n----------------------------------------\n🆔 *Booking ID*: *${newBooking.id}*\n🩺 *Service*: ${newBooking.serviceName}\n👤 *Patient*: ${newBooking.patientName}\n📅 *Scheduled Date*: ${newBooking.date}\n🕘 *Time Slot*: ${newBooking.slot}\n📍 *Pincode*: ${newBooking.pincode}\n👨‍⚕️ *Assigned Professional*: ${staffName}\n💰 *Total Amount*: ₹${newBooking.amount}\n💳 *Payment*: Pending (Pay on Visit / Online UPI)\n----------------------------------------\n📱 *A WhatsApp reminder will be sent 1 hour before the visit.*`,
                     bookingId: newBooking.id
                 };
             }
@@ -194,7 +193,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
             return {
                 type: 'TEXT',
-                text: `Booking cancelled. Type *menu* anytime to start again.`
+                text: `❌ *Booking Cancelled*\n----------------------------------------\nType *menu* or *hi* anytime to start again.`
             };
         }
 
@@ -209,13 +208,13 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 const staff = found.assignedStaff ? `${found.assignedStaff.name} (${found.assignedStaff.phone})` : 'Under Allocation';
                 return {
                     type: 'TEXT',
-                    text: `📋 *Booking Details for ${found.id}*\n\n• **Service**: ${found.serviceName}\n• **Patient**: ${found.patientName}\n• **Status**: 🟢 *${found.status}*\n• **Scheduled Date**: ${found.date} @ ${found.slot}\n• **Assigned Professional**: ${staff}\n• **Payment Status**: ${found.paymentStatus}`
+                    text: `📋 *BOOKING DETAILS FOR ${found.id}*\n----------------------------------------\n• *Service*: ${found.serviceName}\n• *Patient*: ${found.patientName}\n• *Status*: 🟢 *${found.status}*\n• *Scheduled Date*: ${found.date} @ ${found.slot}\n• *Assigned Staff*: ${staff}\n• *Payment Status*: ${found.paymentStatus}\n----------------------------------------\nType *menu* to return to main options.`
                 };
             }
 
             return {
                 type: 'TEXT',
-                text: `No booking found for ID "${bookingId}". Type *menu* to return to main options.`
+                text: `❌ No booking found for ID "${bookingId}". Type *menu* to return to main options.`
             };
         }
 

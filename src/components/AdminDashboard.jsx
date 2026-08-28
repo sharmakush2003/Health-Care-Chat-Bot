@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Users, Calendar, AlertTriangle, CheckCircle, Clock, Truck, ShieldAlert, FileText, Download, Phone, RefreshCw, MessageSquare, Send, CheckCheck, Sparkles, Stethoscope, UserCheck, HeartPulse, FlaskConical, Filter, Zap, ArrowUpRight } from 'lucide-react';
+import { Activity, Users, Calendar, AlertTriangle, CheckCircle, Clock, Truck, ShieldAlert, FileText, Download, Phone, RefreshCw, MessageSquare, Send, CheckCheck, Sparkles, Stethoscope, UserCheck, HeartPulse, FlaskConical, Filter } from 'lucide-react';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState(null);
@@ -90,40 +90,32 @@ export default function AdminDashboard() {
         : bookings.filter(b => b.status === filterStatus);
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
-            {/* STUNNING BRANDING HEADER BAR */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-teal-950 p-6 rounded-3xl border border-slate-800 shadow-2xl backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                
-                <div className="flex items-center space-x-4 z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-teal-500/20 ring-4 ring-teal-500/20">
-                        <Stethoscope className="w-7 h-7 text-slate-950" />
+        <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 sm:p-6 lg:p-8 space-y-6">
+            {/* Header Bar */}
+            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
+                        <Stethoscope className="w-6 h-6" />
                     </div>
                     <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                                Health Saathi Chatbot
-                            </h1>
-                            <span className="bg-teal-500/20 text-teal-300 text-xs px-3 py-1 rounded-full font-bold border border-teal-500/30 backdrop-blur-md">
+                        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            Health Saathi Chatbot
+                            <span className="bg-teal-50 text-teal-700 text-xs px-2.5 py-1 rounded-full font-semibold border border-teal-200">
                                 by AutomateX.co.in
                             </span>
-                            <span className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full font-semibold border border-emerald-500/30">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                                Live Sync Active
-                            </span>
-                        </div>
-                        <p className="text-slate-400 text-xs sm:text-sm mt-1 flex items-center gap-2">
-                            <span>Real-Time Patient WhatsApp Feed</span> • <span>Doctor-Guided Home Healthcare</span> • <span>Automated Staff Allocation</span>
+                        </h1>
+                        <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
+                            Live Patient WhatsApp Messages • Automated Flow • Staff Assignment • Medical Bookings
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-3 z-10">
+                <div className="flex items-center space-x-3">
                     <button
                         onClick={fetchData}
-                        className="flex items-center space-x-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 px-4 py-2.5 rounded-2xl text-xs font-bold transition shadow-sm hover:border-teal-500/50 active:scale-95"
+                        className="flex items-center space-x-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-4 py-2 rounded-xl text-sm font-semibold transition"
                     >
-                        <RefreshCw className={`w-4 h-4 text-teal-400 ${loading ? 'animate-spin' : ''}`} />
+                        <RefreshCw className={`w-4 h-4 text-teal-600 ${loading ? 'animate-spin' : ''}`} />
                         <span>Refresh Live Data</span>
                     </button>
                 </div>
@@ -131,31 +123,29 @@ export default function AdminDashboard() {
 
             {/* Emergency Escalation Alert Banner */}
             {emergencyAlerts.length > 0 && (
-                <div className="bg-rose-950/60 border border-rose-800/80 rounded-3xl p-5 shadow-xl backdrop-blur-md">
+                <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 shadow-sm">
                     <div className="flex items-start space-x-3">
-                        <ShieldAlert className="w-6 h-6 text-rose-500 shrink-0 mt-0.5 animate-bounce" />
+                        <ShieldAlert className="w-6 h-6 text-rose-600 shrink-0 mt-0.5 animate-pulse" />
                         <div className="flex-1">
-                            <h3 className="text-rose-200 font-bold text-sm flex items-center justify-between">
-                                <span className="flex items-center gap-2">
-                                    🚨 CLINICAL EMERGENCY ALERTS ({emergencyAlerts.length})
-                                </span>
-                                <span className="text-xs bg-rose-900/80 text-rose-300 px-2.5 py-0.5 rounded font-mono font-bold border border-rose-700">
+                            <h3 className="text-rose-900 font-bold text-sm flex items-center justify-between">
+                                <span>🚨 CLINICAL EMERGENCY ALERTS ({emergencyAlerts.length})</span>
+                                <span className="text-xs bg-rose-200 text-rose-800 px-2 py-0.5 rounded font-mono font-semibold">
                                     108 Advisory Triggered
                                 </span>
                             </h3>
-                            <div className="mt-3 space-y-2">
+                            <div className="mt-2 space-y-2">
                                 {emergencyAlerts.map(alert => (
-                                    <div key={alert.id} className="bg-slate-900/80 p-3.5 rounded-2xl border border-rose-800/50 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-3">
+                                    <div key={alert.id} className="bg-white p-3 rounded-xl border border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-2">
                                         <div>
-                                            <span className="font-bold text-white text-sm">{alert.patientName}</span>
-                                            <span className="text-slate-400 ml-2 font-mono">({alert.phone})</span>
-                                            <span className="text-rose-400 font-semibold ml-2 bg-rose-950 px-2.5 py-0.5 rounded-lg border border-rose-800/60">
+                                            <span className="font-bold text-slate-900">{alert.patientName}</span>
+                                            <span className="text-slate-500 ml-2 font-mono">{alert.phone}</span>
+                                            <span className="text-rose-700 font-medium ml-2 bg-rose-100 px-2 py-0.5 rounded">
                                                 Triggered: "{alert.triggerKeyword}"
                                             </span>
                                         </div>
                                         <a
                                             href={`tel:${alert.phone}`}
-                                            className="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2 rounded-xl font-bold flex items-center justify-center space-x-1.5 transition shrink-0 shadow-lg shadow-rose-600/30"
+                                            className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1.5 rounded-lg font-semibold flex items-center justify-center space-x-1 transition shrink-0"
                                         >
                                             <Phone className="w-3.5 h-3.5" />
                                             <span>Call Patient Immediately</span>
@@ -171,56 +161,40 @@ export default function AdminDashboard() {
             {/* Metric KPI Cards */}
             {stats && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-lg relative overflow-hidden group hover:border-teal-500/50 transition-all">
-                        <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-teal-300 transition">
+                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
                             <span>WhatsApp Enquiries</span>
-                            <div className="w-8 h-8 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 border border-teal-500/20">
-                                <MessageSquare className="w-4 h-4" />
-                            </div>
+                            <MessageSquare className="w-4 h-4 text-teal-600" />
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-white mt-3">{stats.totalEnquiries}</div>
-                        <div className="text-xs text-teal-400 font-semibold mt-1 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-teal-400"></span> Real Patient Messages
-                        </div>
+                        <div className="text-3xl font-extrabold text-slate-900 mt-2">{stats.totalEnquiries}</div>
+                        <div className="text-xs text-teal-600 font-medium mt-1">Live Messages Received</div>
                     </div>
 
-                    <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-lg relative overflow-hidden group hover:border-blue-500/50 transition-all">
-                        <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-teal-300 transition">
+                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
                             <span>Total Patient Bookings</span>
-                            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
-                                <Calendar className="w-4 h-4" />
-                            </div>
+                            <Calendar className="w-4 h-4 text-blue-600" />
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-white mt-3">{stats.todaysBookings}</div>
-                        <div className="text-xs text-blue-400 font-semibold mt-1 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-blue-400"></span> Confirmed Patient Visits
-                        </div>
+                        <div className="text-3xl font-extrabold text-slate-900 mt-2">{stats.todaysBookings}</div>
+                        <div className="text-xs text-blue-600 font-medium mt-1">Confirmed Patients</div>
                     </div>
 
-                    <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-lg relative overflow-hidden group hover:border-amber-500/50 transition-all">
-                        <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-amber-300 transition">
+                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
                             <span>Pending Staff</span>
-                            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
-                                <Clock className="w-4 h-4" />
-                            </div>
+                            <Clock className="w-4 h-4 text-amber-500" />
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-amber-400 mt-3">{stats.pendingAssignment}</div>
-                        <div className="text-xs text-amber-400/90 font-semibold mt-1 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-amber-400"></span> Awaiting Allocation
-                        </div>
+                        <div className="text-3xl font-extrabold text-amber-600 mt-2">{stats.pendingAssignment}</div>
+                        <div className="text-xs text-amber-700 font-medium mt-1">Awaiting Allocation</div>
                     </div>
 
-                    <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl shadow-lg relative overflow-hidden group hover:border-emerald-500/50 transition-all">
-                        <div className="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-emerald-300 transition">
+                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
                             <span>Service Revenue</span>
-                            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
-                                <Activity className="w-4 h-4" />
-                            </div>
+                            <Activity className="w-4 h-4 text-emerald-600" />
                         </div>
-                        <div className="text-3xl sm:text-4xl font-black text-emerald-400 mt-3">₹{stats.totalRevenue}</div>
-                        <div className="text-xs text-emerald-400 font-semibold mt-1 flex items-center gap-1">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Verified Booking Volume
-                        </div>
+                        <div className="text-3xl font-extrabold text-slate-900 mt-2">₹{stats.totalRevenue}</div>
+                        <div className="text-xs text-emerald-600 font-medium mt-1">Total Healthcare Volume</div>
                     </div>
                 </div>
             )}
@@ -228,85 +202,68 @@ export default function AdminDashboard() {
             {/* Main Content Layout: Live WhatsApp Inbox (Left) + Medical Bookings Pipeline (Right) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* LIVE WHATSAPP MESSAGES FEED & TEST SIMULATOR */}
-                <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 flex flex-col h-[700px]">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <div className="flex items-center space-x-2.5">
-                            <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                                <MessageSquare className="w-4 h-4" />
-                            </div>
-                            <h2 className="font-extrabold text-white text-base">Live WhatsApp Feed</h2>
+                <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col h-[680px]">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center space-x-2">
+                            <MessageSquare className="w-5 h-5 text-teal-600" />
+                            <h2 className="font-bold text-slate-900 text-base">Live WhatsApp Messages Feed</h2>
                         </div>
-                        <span className="bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
                             Auto-Replied (WhatsApp API)
                         </span>
                     </div>
 
                     {/* Quick Trigger Preset Buttons */}
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-                        <span className="text-slate-400 font-semibold shrink-0 text-[11px]">Quick Test:</span>
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                        <span className="text-slate-400 font-semibold shrink-0">Simulate:</span>
                         <button
                             onClick={() => handleSendTestWebhook('hi')}
-                            className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-xl border border-slate-700 shrink-0 font-medium text-xs transition"
+                            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 shrink-0 font-medium"
                         >
                             👋 Send "Hi"
                         </button>
                         <button
                             onClick={() => handleSendTestWebhook('3')}
-                            className="bg-teal-950 hover:bg-teal-900 text-teal-300 px-3 py-1 rounded-xl border border-teal-800/80 shrink-0 font-medium text-xs transition"
+                            className="bg-teal-50 hover:bg-teal-100 text-teal-700 px-2.5 py-1 rounded-lg border border-teal-200 shrink-0 font-medium"
                         >
                             🏥 Book Physio
                         </button>
                         <button
                             onClick={() => handleSendTestWebhook('Severe chest pain')}
-                            className="bg-rose-950 hover:bg-rose-900 text-rose-300 px-3 py-1 rounded-xl border border-rose-800/80 shrink-0 font-medium text-xs transition"
+                            className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg border border-rose-200 shrink-0 font-medium"
                         >
                             🚨 Emergency
                         </button>
                     </div>
 
                     {/* Messages Scroll Area */}
-                    <div className="flex-1 overflow-y-auto space-y-3.5 pr-1.5 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto space-y-3 pr-1">
                         {messages.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-center p-8 space-y-3">
-                                <div className="w-14 h-14 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 border border-slate-700 animate-pulse">
-                                    <MessageSquare className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h4 className="text-white font-bold text-sm">No Live Messages Yet</h4>
-                                    <p className="text-slate-400 text-xs mt-1 max-w-xs">
-                                        Send a WhatsApp message from your phone or click "Send Hi" above to see live real-time conversations!
-                                    </p>
-                                </div>
+                            <div className="text-center py-16 text-slate-400 text-sm space-y-2">
+                                <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
+                                <p className="font-semibold text-slate-600">No Live WhatsApp Messages Yet</p>
+                                <p className="text-xs text-slate-400">Send a WhatsApp message from your phone to see live conversations here.</p>
                             </div>
                         ) : (
                             messages.map((msg) => (
-                                <div key={msg.id} className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-2.5 text-xs hover:border-teal-500/40 transition-all shadow-md">
-                                    {/* Incoming Patient Message Header */}
-                                    <div className="flex items-center justify-between">
+                                <div key={msg.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs hover:border-teal-300 transition">
+                                    {/* Incoming Patient Message */}
+                                    <div className="flex items-start justify-between">
                                         <div className="flex items-center space-x-2">
-                                            <div className="w-7 h-7 rounded-full bg-teal-600/30 text-teal-300 flex items-center justify-center font-bold text-xs border border-teal-500/40">
-                                                {msg.senderName ? msg.senderName.charAt(0) : 'P'}
-                                            </div>
-                                            <div>
-                                                <span className="font-bold text-white text-sm">{msg.senderName}</span>
-                                            </div>
+                                            <span className="font-bold text-slate-900 text-sm">{msg.senderName}</span>
+                                            <span className="text-[11px] text-slate-400 font-mono">({msg.phone})</span>
                                         </div>
-                                        <span className="text-[10px] text-slate-400 font-mono bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{msg.timestamp}</span>
+                                        <span className="text-[10px] text-slate-400 font-mono">{msg.timestamp}</span>
+                                    </div>
+                                    <div className="bg-white p-2.5 rounded-lg border border-slate-200 font-medium text-slate-800 text-xs">
+                                        📩 Patient: "{msg.userMessage}"
                                     </div>
 
-                                    {/* Patient Message Bubble */}
-                                    <div className="bg-slate-900 p-3 rounded-xl border border-slate-800 font-semibold text-slate-200 text-xs">
-                                        📩 <span className="text-slate-400 font-normal">Patient:</span> "{msg.userMessage}"
-                                    </div>
-
-                                    {/* Bot Auto Reply Bubble */}
-                                    <div className="bg-teal-950/60 p-3.5 rounded-xl border border-teal-800/60 text-teal-100 text-xs whitespace-pre-line leading-relaxed font-sans shadow-inner">
-                                        <div className="font-bold text-teal-300 flex items-center justify-between mb-1.5 text-[11px] border-b border-teal-800/40 pb-1">
-                                            <span className="flex items-center gap-1.5">
-                                                🤖 Health Saathi Bot (Auto-Reply):
-                                            </span>
-                                            <CheckCheck className="w-4 h-4 text-emerald-400" />
+                                    {/* Bot Auto Reply */}
+                                    <div className="bg-teal-50/80 p-2.5 rounded-lg border border-teal-200 text-teal-900 text-[11px] whitespace-pre-line leading-relaxed">
+                                        <div className="font-semibold text-teal-800 flex items-center justify-between mb-1">
+                                            <span>🤖 Health Saathi Bot (Auto-Reply):</span>
+                                            <CheckCheck className="w-3.5 h-3.5 text-teal-600" />
                                         </div>
                                         {msg.botReplyText}
                                     </div>
@@ -316,19 +273,19 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Send Custom Webhook Message Box */}
-                    <div className="pt-3 border-t border-slate-800 flex items-center space-x-2">
+                    <div className="pt-3 border-t border-slate-100 flex items-center space-x-2">
                         <input
                             type="text"
                             value={simMessage}
                             onChange={(e) => setSimMessage(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSendTestWebhook()}
-                            placeholder="Type test message (e.g. 'hi', '1', 'chest pain')..."
-                            className="flex-1 bg-slate-950 text-white placeholder-slate-500 text-xs px-4 py-3 rounded-2xl border border-slate-800 focus:outline-none focus:border-teal-500"
+                            placeholder="Type test patient message (e.g. 'book nurse')..."
+                            className="flex-1 bg-slate-50 text-slate-900 placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-teal-500 focus:bg-white"
                         />
                         <button
                             onClick={() => handleSendTestWebhook()}
                             disabled={simSending}
-                            className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-3 rounded-2xl font-bold text-xs transition flex items-center space-x-1.5 shrink-0 shadow-lg shadow-teal-600/30"
+                            className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-1 shrink-0"
                         >
                             <Send className="w-3.5 h-3.5" />
                             <span>{simSending ? 'Sending...' : 'Send'}</span>
@@ -337,13 +294,11 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* MEDICAL BOOKINGS MANAGEMENT PIPELINE */}
-                <div className="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 flex flex-col h-[700px]">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                        <div className="flex items-center space-x-2.5">
-                            <div className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
-                                <Calendar className="w-4 h-4" />
-                            </div>
-                            <h2 className="font-extrabold text-white text-base">Patient Bookings & Allocation Pipeline</h2>
+                <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col h-[680px]">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div className="flex items-center space-x-2">
+                            <Calendar className="w-5 h-5 text-blue-600" />
+                            <h2 className="font-bold text-slate-900 text-base">Patient Bookings & Allocation Pipeline</h2>
                         </div>
 
                         {/* Status Filter Pills */}
@@ -352,9 +307,9 @@ export default function AdminDashboard() {
                                 <button
                                     key={st}
                                     onClick={() => setFilterStatus(st)}
-                                    className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap text-xs ${filterStatus === st
-                                            ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
-                                            : 'bg-slate-800 hover:bg-slate-700 text-slate-400'
+                                    className={`px-2.5 py-1 rounded-lg font-bold transition whitespace-nowrap ${filterStatus === st
+                                            ? 'bg-teal-600 text-white shadow-sm'
+                                            : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
                                         }`}
                                 >
                                     {st}
@@ -364,55 +319,49 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Bookings Table */}
-                    <div className="flex-1 overflow-y-auto border border-slate-800 rounded-2xl custom-scrollbar bg-slate-950/60">
-                        <table className="w-full text-left text-xs text-slate-300">
-                            <thead className="text-[11px] font-extrabold uppercase bg-slate-900 text-slate-400 border-b border-slate-800 sticky top-0 backdrop-blur-md">
+                    <div className="flex-1 overflow-y-auto border border-slate-200 rounded-xl">
+                        <table className="w-full text-left text-xs text-slate-700">
+                            <thead className="text-[11px] font-bold uppercase bg-slate-100 text-slate-600 border-b border-slate-200 sticky top-0">
                                 <tr>
-                                    <th className="p-3.5">Booking ID</th>
-                                    <th className="p-3.5">Service & Patient</th>
-                                    <th className="p-3.5">Date & Slot</th>
-                                    <th className="p-3.5">Assigned Staff</th>
-                                    <th className="p-3.5">Status</th>
-                                    <th className="p-3.5 text-right">PDF Invoice</th>
+                                    <th className="p-3">Booking ID</th>
+                                    <th className="p-3">Service & Patient</th>
+                                    <th className="p-3">Date & Slot</th>
+                                    <th className="p-3">Assigned Staff</th>
+                                    <th className="p-3">Status</th>
+                                    <th className="p-3 text-right">PDF Invoice</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/60">
+                            <tbody className="divide-y divide-slate-100">
                                 {filteredBookings.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="p-12 text-center text-slate-500">
-                                            <div className="flex flex-col items-center justify-center space-y-2">
-                                                <Calendar className="w-8 h-8 text-slate-700" />
-                                                <p className="font-semibold text-slate-400 text-sm">No Live Patient Bookings Yet</p>
-                                                <p className="text-xs text-slate-500 max-w-sm">
-                                                    When a patient completes a booking on WhatsApp, it will automatically populate here in real time.
-                                                </p>
-                                            </div>
+                                        <td colSpan="6" className="p-12 text-center text-slate-400">
+                                            No bookings match the selected status filter.
                                         </td>
                                     </tr>
                                 ) : (
                                     filteredBookings.map((b) => (
-                                        <tr key={b.id} className="hover:bg-slate-900/80 transition">
-                                            <td className="p-3.5 font-mono font-bold text-teal-400">{b.id}</td>
-                                            <td className="p-3.5">
-                                                <div className="font-bold text-white">{b.serviceName}</div>
-                                                <div className="text-[11px] text-slate-400 font-medium">{b.patientName} ({b.phone})</div>
-                                                <div className="text-[10px] text-slate-500 font-mono">Pincode: {b.pincode}</div>
+                                        <tr key={b.id} className="hover:bg-slate-50 transition">
+                                            <td className="p-3 font-mono font-bold text-teal-700">{b.id}</td>
+                                            <td className="p-3">
+                                                <div className="font-bold text-slate-900">{b.serviceName}</div>
+                                                <div className="text-[11px] text-slate-500">{b.patientName} ({b.phone})</div>
+                                                <div className="text-[10px] text-slate-400">Pincode: {b.pincode}</div>
                                             </td>
-                                            <td className="p-3.5 text-[11px]">
-                                                <div className="font-bold text-slate-200">{b.date}</div>
-                                                <div className="text-teal-400 font-mono font-bold">{b.slot}</div>
+                                            <td className="p-3 text-[11px]">
+                                                <div className="font-semibold text-slate-800">{b.date}</div>
+                                                <div className="text-teal-600 font-mono font-bold">{b.slot}</div>
                                             </td>
-                                            <td className="p-3.5 text-[11px]">
+                                            <td className="p-3 text-[11px]">
                                                 {b.assignedStaff ? (
                                                     <div>
-                                                        <div className="font-bold text-emerald-400">{b.assignedStaff.name}</div>
-                                                        <div className="text-[10px] text-slate-500 font-mono">{b.assignedStaff.phone}</div>
+                                                        <div className="font-bold text-emerald-700">{b.assignedStaff.name}</div>
+                                                        <div className="text-[10px] text-slate-400">{b.assignedStaff.phone}</div>
                                                     </div>
                                                 ) : (
                                                     <select
                                                         onChange={(e) => handleUpdateStatus(b.id, 'Assigned', e.target.value)}
                                                         defaultValue=""
-                                                        className="bg-amber-950/80 text-amber-300 text-[11px] font-bold border border-amber-800 rounded-xl px-2.5 py-1 focus:outline-none"
+                                                        className="bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-300 rounded-lg px-2 py-1 focus:outline-none"
                                                     >
                                                         <option value="" disabled>Assign Staff...</option>
                                                         {staff.map(s => (
@@ -421,11 +370,11 @@ export default function AdminDashboard() {
                                                     </select>
                                                 )}
                                             </td>
-                                            <td className="p-3.5">
+                                            <td className="p-3">
                                                 <select
                                                     value={b.status}
                                                     onChange={(e) => handleUpdateStatus(b.id, e.target.value)}
-                                                    className="bg-slate-900 border border-slate-700 text-white font-bold text-[11px] rounded-xl px-2.5 py-1 focus:outline-none focus:border-teal-500"
+                                                    className="bg-white border border-slate-300 text-slate-800 font-semibold text-[11px] rounded-lg px-2 py-1 focus:outline-none focus:border-teal-500"
                                                 >
                                                     <option value="Pending Assignment">Pending Assignment</option>
                                                     <option value="Assigned">Assigned</option>
@@ -434,14 +383,14 @@ export default function AdminDashboard() {
                                                     <option value="Completed">Completed</option>
                                                 </select>
                                             </td>
-                                            <td className="p-3.5 text-right">
+                                            <td className="p-3 text-right">
                                                 <a
                                                     href={`/api/bookings/${b.id}/invoice`}
                                                     target="_blank"
                                                     rel="noreferrer"
-                                                    className="inline-flex items-center space-x-1.5 bg-teal-950 hover:bg-teal-900 text-teal-300 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-teal-800 transition shadow-sm"
+                                                    className="inline-flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-teal-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-300 transition"
                                                 >
-                                                    <Download className="w-3.5 h-3.5" />
+                                                    <Download className="w-3 h-3" />
                                                     <span>PDF</span>
                                                 </a>
                                             </td>
@@ -454,24 +403,24 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* STAFF DIRECTORY ROSTER & META WEBHOOK INFO */}
+            {/* STAFF DIRECTORY ROSTER & META WEBHOOK INFO (CLEAN WHITE CARDS) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Staff Roster */}
-                <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3.5">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
-                            <Users className="w-4 h-4 text-teal-400" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <Users className="w-4 h-4 text-teal-600" />
                             Verified Healthcare Staff Roster
                         </h3>
-                        <span className="text-xs bg-slate-800 text-teal-300 px-3 py-1 rounded-full font-mono font-bold border border-slate-700">
+                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-semibold">
                             {staff.length} Active
                         </span>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {staff.map(s => (
-                            <div key={s.id} className="p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-1 text-xs">
-                                <div className="font-bold text-white">{s.name}</div>
-                                <div className="text-[11px] text-teal-400 font-semibold">{s.role}</div>
+                            <div key={s.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                                <div className="font-bold text-slate-900">{s.name}</div>
+                                <div className="text-[11px] text-teal-700 font-semibold">{s.role}</div>
                                 <div className="text-[10px] text-slate-500 font-mono">{s.phone} • Coverage: {s.location}</div>
                             </div>
                         ))}
@@ -479,30 +428,29 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Meta Webhook Technical Spec */}
-                <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-3.5">
-                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-teal-400" />
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-teal-600" />
                             WhatsApp Cloud API Webhook Listener
                         </h3>
-                        <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1 rounded-full border border-emerald-500/30 flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                            Active Gateway
+                        <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">
+                            Active Listener
                         </span>
                     </div>
 
-                    <div className="space-y-2.5 font-mono text-xs text-slate-300 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
+                    <div className="space-y-2 font-mono text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
                         <div>
-                            <span className="text-slate-500">Live Webhook Endpoint:</span>
-                            <div className="text-teal-400 font-bold break-all mt-0.5">https://garments-erp-bot.onrender.com/api/webhook</div>
+                            <span className="text-slate-400">Live Webhook Endpoint:</span>
+                            <div className="text-teal-700 font-bold break-all">https://garments-erp-bot.onrender.com/api/webhook</div>
                         </div>
-                        <div className="pt-2 border-t border-slate-800/80">
-                            <span className="text-slate-500">Verify Token:</span>
-                            <div className="text-white font-bold mt-0.5">automatex_copilot_token</div>
+                        <div className="pt-2 border-t border-slate-200">
+                            <span className="text-slate-400">Verify Token:</span>
+                            <div className="text-slate-900 font-bold">automatex_copilot_token</div>
                         </div>
-                        <div className="pt-2 border-t border-slate-800/80">
-                            <span className="text-slate-500">Active Bot WABA Number:</span>
-                            <div className="text-emerald-400 font-bold mt-0.5">+91 74250 16636 (Digify_soft)</div>
+                        <div className="pt-2 border-t border-slate-200">
+                            <span className="text-slate-400">Active Bot WABA Number:</span>
+                            <div className="text-emerald-700 font-bold">+91 74250 16636 (Digify_soft)</div>
                         </div>
                     </div>
                 </div>
