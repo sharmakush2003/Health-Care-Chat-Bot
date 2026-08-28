@@ -10,6 +10,10 @@ const EMERGENCY_KEYWORDS = [
  * Implements the end-to-end 17-stage process flow for WhatsApp chatbot
  */
 export function processHealthcareMessage(userPhone, messageText, payloadData = null) {
+    let cleanUserPhone = (userPhone || '').toString().replace(/\D/g, '');
+    if (cleanUserPhone.length === 10) cleanUserPhone = '91' + cleanUserPhone;
+    const phoneKey = cleanUserPhone || userPhone;
+
     const text = (messageText || '').trim().toLowerCase();
 
     // 1. Emergency Clinical Escalation Safeguard Check
@@ -32,10 +36,10 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
     }
 
     // Initialize or load conversation state for user
-    if (!CONVERSATION_STATES[userPhone]) {
-        CONVERSATION_STATES[userPhone] = { step: 'WELCOME', data: {} };
+    if (!CONVERSATION_STATES[phoneKey]) {
+        CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
     }
-    const state = CONVERSATION_STATES[userPhone];
+    const state = CONVERSATION_STATES[phoneKey];
 
     // Reset flow if user sends any greeting or reset command
     const GREETINGS = ['hi', 'hii', 'hiii', 'heyy', 'hey', 'hello', 'namaste', 'menu', 'restart', 'start', '0', 'help', 'healthcare', 'doctor', 'bot', 'khaira', 'good morning', 'good afternoon', 'good evening'];
@@ -208,7 +212,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 });
 
                 // Reset state
-                CONVERSATION_STATES[userPhone] = { step: 'WELCOME', data: {} };
+                CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
 
                 const staffName = newBooking.assignedStaff ? newBooking.assignedStaff.name : 'Allocating nearby staff...';
 
@@ -223,7 +227,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 };
             }
 
-            CONVERSATION_STATES[userPhone] = { step: 'WELCOME', data: {} };
+            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
             return {
                 type: 'TEXT',
                 text: `Booking cancelled. Type *menu* anytime to start again.`
@@ -235,7 +239,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             const bookings = getBookings();
             const found = bookings.find(b => b.id === bookingId || b.phone === userPhone);
 
-            CONVERSATION_STATES[userPhone] = { step: 'WELCOME', data: {} };
+            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
 
             if (found) {
                 const staff = found.assignedStaff ? `${found.assignedStaff.name} (${found.assignedStaff.phone})` : 'Under Allocation';
@@ -252,7 +256,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         }
 
         default: {
-            CONVERSATION_STATES[userPhone] = { step: 'WELCOME', data: {} };
+            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
             return processHealthcareMessage(userPhone, 'menu');
         }
     }

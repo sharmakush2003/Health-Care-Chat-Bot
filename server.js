@@ -41,8 +41,10 @@ app.get('/logs', (req, res) => {
     res.type('text/plain').send(logStore.join('\n'));
 });
 
-// Meta & AutobotChat WhatsApp Webhook endpoints
+// Meta & AutobotChat WhatsApp Webhook endpoints (Support /api/webhook, /webhook, /api/v1/webhook)
 app.use('/api/webhook', webhookRoutes);
+app.use('/webhook', webhookRoutes);
+app.use('/api/v1/webhook', webhookRoutes);
 
 // Admin REST APIs
 app.use('/api', apiRoutes);

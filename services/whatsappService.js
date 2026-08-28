@@ -7,7 +7,10 @@ const DEFAULT_USERNAME = 'Digify_soft';
  * Send outbound WhatsApp message using AutobotChat (Ported directly from Garments ERP worker)
  */
 export async function sendWhatsAppMessage(recipientPhone, messagePayload, pdfUrl = null, pdfName = null) {
-    const cleanPhone = (recipientPhone || '').toString().replace(/\D/g, '');
+    let cleanPhone = (recipientPhone || '').toString().replace(/\D/g, '');
+    if (cleanPhone.length === 10) {
+        cleanPhone = '91' + cleanPhone;
+    }
     console.log(`[Outbound WhatsApp API] Sending message to ${cleanPhone}...`);
 
     const provider = process.env.WHATSAPP_PROVIDER || 'AUTOBOTCHAT';
