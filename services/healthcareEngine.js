@@ -163,7 +163,10 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         }
 
         case 'CONFIRMATION': {
-            if (text === '1' || payloadData === 'CONFIRM_YES' || text.includes('yes') || text.includes('confirm')) {
+            const CONFIRM_WORDS = ['1', 'yes', 'confirm', 'y', 'ok', 'ha', 'haan', 'sure', 'book', 'done'];
+            const isConfirm = CONFIRM_WORDS.some(w => text === w || text.includes(w)) || payloadData === 'CONFIRM_YES';
+
+            if (isConfirm) {
                 const service = state.data.service || SERVICES[0];
                 const newBooking = addBooking({
                     serviceId: service.id,
@@ -172,8 +175,8 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                     patientName: state.data.patientDetails || 'Patient',
                     phone: userPhone,
                     pincode: state.data.pincode || '302012',
-                    date: state.data.date,
-                    slot: state.data.slot,
+                    date: state.data.date || 'Tomorrow',
+                    slot: state.data.slot || '11:00 AM',
                     amount: service.basePrice,
                     paymentStatus: 'Pending',
                 });
