@@ -88,10 +88,21 @@ router.post('/', async (req, res) => {
                 messageText = message.text ? message.text.body : '';
             }
         } 
-        // 2. AutobotChat / Goshort webhook payload format (sender_id or from or wa_id or phone)
+        // 2. AutobotChat / Goshort webhook payload format (receiver / sender_id / from / wa_id)
         else {
-            senderPhone = target.sender_id || target.from || target.wa_id || target.mobile || target.phone || target.number ||
-                          body.sender_id || body.from || body.wa_id || body.mobile || body.phone || body.number;
+            const BOT_NUMBERS = ['917425016636', '7425016636'];
+
+            // In AutobotChat webhooks, sender_id is often the bot number, and receiver is the patient!
+            let rawPhone = target.receiver || body.receiver || target.customer_phone || target.from_user || target.sender_id || target.from || target.wa_id || target.mobile || target.phone || target.number;
+            let cleanPhoneDigits = (rawPhone || '').toString().replace(/\D/g, '');
+
+            // If extracted phone equals the bot's own number, swap to receiver/to field
+            if (BOT_NUMBERS.includes(cleanPhoneDigits) || cleanPhoneDigits === (body.wabaNumber || '').replace(/\D/g, '')) {
+                rawPhone = body.receiver || body.to || target.receiver || target.to || target.from || body.from;
+                cleanPhoneDigits = (rawPhone || '').toString().replace(/\D/g, '');
+            }
+
+            senderPhone = cleanPhoneDigits || rawPhone;
 
             // Interactive response handling
             const interactiveObj = target.interactive || body.interactive;
