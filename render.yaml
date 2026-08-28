@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: healthcare-chatbot-service
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: USE_REDIS
+        value: "false"
+      - key: WHATSAPP_PROVIDER
+        value: AUTOBOTCHAT
+      - key: AUTOBOTCHAT_USERNAME
+        value: Digify_soft
+      - key: AUTOBOTCHAT_JWT_TOKEN
+        sync: false
+      - key: META_VERIFY_TOKEN
+        value: automatex_copilot_token
+      - key: GROQ_API_KEY
+        sync: false
