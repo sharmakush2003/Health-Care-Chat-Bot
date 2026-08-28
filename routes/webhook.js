@@ -144,11 +144,16 @@ router.post('/', async (req, res) => {
         // Clean phone number format
         senderPhone = senderPhone.toString().trim();
 
+        // Extract patient display name if provided by WhatsApp webhook
+        const displayName = body.display_name || target.display_name ||
+            body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0]?.profile?.name ||
+            target.name || target.pushname || null;
+
         // Process message through Healthcare Engine
         const botResponse = processHealthcareMessage(senderPhone, messageText, payloadData);
 
         // Save to Live WhatsApp Messages log for Admin Dashboard
-        addLiveWhatsAppMessage(senderPhone, messageText || payloadData || 'Selection', botResponse.text);
+        addLiveWhatsAppMessage(senderPhone, messageText || payloadData || 'Selection', botResponse.text, displayName);
 
         // Dispatch Outbound WhatsApp message back to patient's real phone!
         const result = await sendWhatsAppMessage(senderPhone, botResponse);

@@ -82,16 +82,17 @@ export function getLiveMessages() {
     return LIVE_WHATSAPP_MESSAGES;
 }
 
-export function addLiveWhatsAppMessage(phone, userMessage, botReplyText) {
+export function addLiveWhatsAppMessage(phone, userMessage, botReplyText, displayName = null) {
     const cleanPhone = (phone || '').toString();
+    const formattedName = displayName ? `${displayName} (${cleanPhone})` : `Patient (${cleanPhone || 'WhatsApp User'})`;
     const newMsg = {
         id: `MSG-${Math.floor(1000 + Math.random() * 9000)}`,
         phone: cleanPhone || '+91 WhatsApp Patient',
-        senderName: `Patient (${cleanPhone ? cleanPhone : 'WhatsApp User'})`,
+        senderName: formattedName,
         userMessage: userMessage || 'Message received',
         botReplyText: typeof botReplyText === 'string' ? botReplyText : (botReplyText ? botReplyText.text : 'Automated Reply Sent'),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: 'Auto Replied (Meta API)'
+        status: 'Auto Replied (WhatsApp Cloud API)'
     };
 
     // Keep top 50 messages
