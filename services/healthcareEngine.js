@@ -37,8 +37,11 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
     }
     const state = CONVERSATION_STATES[userPhone];
 
-    // Reset flow if user types "menu", "hi", "hello", "restart"
-    if (['hi', 'hello', 'menu', 'restart', 'start', '0', 'help'].includes(text)) {
+    // Reset flow if user sends any greeting or reset command
+    const GREETINGS = ['hi', 'hii', 'hiii', 'heyy', 'hey', 'hello', 'namaste', 'menu', 'restart', 'start', '0', 'help', 'healthcare', 'doctor', 'bot', 'khaira', 'good morning', 'good afternoon', 'good evening'];
+    const isGreeting = GREETINGS.some(g => text === g || text.startsWith(g + ' ') || text.startsWith(g + '!'));
+
+    if (isGreeting) {
         state.step = 'WELCOME';
         state.data = {};
     }

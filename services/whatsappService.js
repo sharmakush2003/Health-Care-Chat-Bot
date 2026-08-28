@@ -117,11 +117,28 @@ export async function sendWhatsAppMessage(recipientPhone, messagePayload, pdfUrl
         
         // Fallback retry using simple text payload if interactive payload was rejected
         try {
+            let fallbackText = replyText;
+            if (messagePayload && messagePayload.type === 'INTERACTIVE_LIST' && messagePayload.sections) {
+                fallbackText += '\n';
+                messagePayload.sections.forEach(sec => {
+                    fallbackText += `\n*${sec.title}*\n`;
+                    sec.rows.forEach(r => {
+                        fallbackText += `• ${r.title} - ${r.description || ''}\n`;
+                    });
+                });
+                fallbackText += '\nReply with option number (1 to 7) to proceed.';
+            } else if (messagePayload && messagePayload.type === 'INTERACTIVE_BUTTONS' && messagePayload.buttons) {
+                fallbackText += '\n\nOptions:\n';
+                messagePayload.buttons.forEach((b, idx) => {
+                    fallbackText += `${idx + 1}️⃣ ${b.text}\n`;
+                });
+            }
+
             const simplePayload = {
                 messaging_product: 'whatsapp',
                 to: cleanPhone,
                 type: 'text',
-                text: { body: replyText }
+                text: { body: fallbackText }
             };
             const fallbackUrl = `https://wa20.nuke.co.in/v6/api/whatsapp/24/${username}/messages`;
             const res2 = await axios.post(fallbackUrl, simplePayload, {
