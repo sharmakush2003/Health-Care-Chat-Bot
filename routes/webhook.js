@@ -51,19 +51,19 @@ router.post('/', async (req, res) => {
         // Extract nested payload if AutobotChat wraps payload in `data` or `payload` or `result`
         const target = body.data || body.payload || body.result || body;
 
-        // Deduplicate incoming webhooks using message ID (only if explicit message ID exists)
-        const msgId = body.id || target.id || target.whts_ref_id || (target.context ? target.context.id : null);
-        if (msgId && isDuplicateMessage(msgId)) {
-            console.log(`[Webhook] Ignored duplicate webhook for Message ID: ${msgId}`);
-            return;
-        }
-
-        // Check if this is STRICTLY a status update / delivery receipt without any message content
-        const isDeliveryReceipt = (body.delivery_time || body.template_id || body.event === 'DELIVERY' || body.event === 'READ') &&
-            !body.text && !body.message && !body.entry && !target.text && !target.message && !target.interactive;
+        // 1. Check if this is STRICTLY a status update / delivery receipt / read event
+        const isDeliveryReceipt = (body.delivery_time || body.template_id || body.event === 'DELIVERY' || body.event === 'READ' || body.status === 'read' || body.status === 'delivered' || body.status === 'sent' || target.status === 'read' || target.status === 'delivered') &&
+            !body.text && !body.message && !body.entry && !target.text && !target.message && !target.interactive && !target.body;
 
         if (isDeliveryReceipt) {
             console.log('[Webhook] Status report / delivery receipt received & ignored.');
+            return;
+        }
+
+        // 2. Deduplicate incoming webhooks using message ID (only for real message payloads)
+        const msgId = body.id || target.id || target.whts_ref_id || (target.context ? target.context.id : null);
+        if (msgId && isDuplicateMessage(msgId)) {
+            console.log(`[Webhook] Ignored duplicate webhook for Message ID: ${msgId}`);
             return;
         }
 

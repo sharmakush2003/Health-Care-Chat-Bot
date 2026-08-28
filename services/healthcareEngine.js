@@ -8,6 +8,7 @@ const EMERGENCY_KEYWORDS = [
 /**
  * Healthcare Conversation Engine
  * Implements the end-to-end 17-stage process flow for WhatsApp chatbot
+ * Uses ultra-reliable WhatsApp Plain Text session messaging compatible with Meta Cloud API & AutobotChat
  */
 export function processHealthcareMessage(userPhone, messageText, payloadData = null) {
     let cleanUserPhone = (userPhone || '').toString().replace(/\D/g, '');
@@ -26,12 +27,8 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         });
 
         return {
-            type: 'EMERGENCY_ALERT',
-            text: `🚨 *URGENT MEDICAL NOTICE* 🚨\n\nIf the patient is experiencing an immediate life-threatening medical emergency (such as severe chest pain, loss of consciousness, or acute breathing distress):\n\n1️⃣ Please call **108 Emergency Ambulance** or reach the nearest Emergency Room (ER) immediately.\n2️⃣ Our Clinical & Medical Escalation Team has been alerted for this number (${userPhone}).\n\n*Our home healthcare services are for non-emergency home visits.*`,
-            buttons: [
-                { id: 'CALL_108', text: '📞 Call Emergency (108)' },
-                { id: 'TALK_HUMAN', text: '👨‍⚕️ Speak to Doctor/Staff' }
-            ]
+            type: 'TEXT',
+            text: `🚨 *URGENT MEDICAL NOTICE* 🚨\n\nIf the patient is experiencing an immediate life-threatening medical emergency (such as severe chest pain, loss of consciousness, or acute breathing distress):\n\n1️⃣ Please call **108 Emergency Ambulance** or reach the nearest Emergency Room (ER) immediately.\n2️⃣ Our Clinical & Medical Escalation Team has been alerted for this number (${userPhone}).\n\n*Our home healthcare services are for non-emergency home visits.*`
         };
     }
 
@@ -54,31 +51,12 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         case 'WELCOME': {
             state.step = 'MAIN_MENU';
             return {
-                type: 'INTERACTIVE_LIST',
-                text: `👋 *Welcome to AutomateX Home Healthcare Services*\n\nWe provide professional doctor-guided healthcare services directly at your home.\n\nHow can we help you today? Please choose a service from the menu below:`,
-                listTitle: 'Select Service',
-                sections: [
-                    {
-                        title: 'Home Healthcare Services',
-                        rows: SERVICES.map(s => ({
-                            id: `SERVICE_${s.id}`,
-                            title: `${s.id}️⃣ ${s.name}`,
-                            description: `${s.priceDescription}`
-                        }))
-                    },
-                    {
-                        title: 'Support & Status',
-                        rows: [
-                            { id: 'OPT_PRICING', title: '6️⃣ Pricing & Service Information', description: 'View full tariff card & coverage' },
-                            { id: 'OPT_STATUS', title: '7️⃣ Check Existing Booking', description: 'Track your nurse, physio, or lab tech' }
-                        ]
-                    }
-                ]
+                type: 'TEXT',
+                text: `👋 *Welcome to AutomateX Home Healthcare Services*\n\nWe provide professional doctor-guided healthcare services directly at your home.\n\n*How can we help you today? Please reply with a number (1 to 7):*\n\n1️⃣ *Nursing at Home* (₹800/visit or ₹1,500/12-hr)\n2️⃣ *Caretaker at Home* (₹1,200/12-hr or ₹2,000/24-hr)\n3️⃣ *Physiotherapy at Home* (₹900/45-min session)\n4️⃣ *Lab Test / Sample Collection* (Starts @ ₹500)\n5️⃣ *ECG at Home* (₹1,100 per test)\n6️⃣ *Pricing & Service Information*\n7️⃣ *Check Existing Booking Status*\n\nReply with option number (*1 to 7*) to proceed.`
             };
         }
 
         case 'MAIN_MENU': {
-            // Check if user replied with option number (1-7) or list payload
             let selectedServiceId = null;
             if (payloadData && payloadData.startsWith('SERVICE_')) {
                 selectedServiceId = payloadData.replace('SERVICE_', '');
@@ -112,7 +90,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `Invalid selection. Please reply with numbers *1 to 5* to select a service, or *7* to check booking status.`
+                text: `Invalid selection. Please reply with numbers *1 to 5* to select a service, *6* for tariff, or *7* to check booking status.`
             };
         }
 
@@ -122,49 +100,43 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             state.step = 'CAPTURE_DATE';
 
             return {
-                type: 'INTERACTIVE_BUTTONS',
-                text: `📍 Location recorded: *${state.data.pincode}*\n\nWhen do you require the service?`,
-                buttons: [
-                    { id: 'DATE_TODAY', text: 'Today' },
-                    { id: 'DATE_TOMORROW', text: 'Tomorrow' },
-                    { id: 'DATE_CUSTOM', text: 'Select Later Date' }
-                ]
+                type: 'TEXT',
+                text: `📍 Location recorded: *${state.data.pincode}*\n\n*When do you require the service?*\n\n1️⃣ *Today*\n2️⃣ *Tomorrow*\n3️⃣ *Select Later Date*\n\nReply with *1*, *2*, or type a specific date (e.g. *30 Aug*):`
             };
         }
 
         case 'CAPTURE_DATE': {
             let preferredDate = 'Tomorrow';
-            if (payloadData === 'DATE_TODAY' || text.includes('today')) preferredDate = 'Today';
-            else if (payloadData === 'DATE_TOMORROW' || text.includes('tomorrow')) preferredDate = 'Tomorrow';
+            if (text === '1' || payloadData === 'DATE_TODAY' || text.includes('today')) preferredDate = 'Today';
+            else if (text === '2' || payloadData === 'DATE_TOMORROW' || text.includes('tomorrow')) preferredDate = 'Tomorrow';
             else preferredDate = text;
 
             state.data.date = preferredDate;
             state.step = 'SELECT_SLOT';
 
-            const service = state.data.service || SERVICES[2];
+            const service = state.data.service || SERVICES[0];
+            let slotsText = `📅 Date: *${preferredDate}*\n\nPlease select your preferred time slot for **${service.name}**:\n\n`;
+            service.slots.forEach((slot, idx) => {
+                slotsText += `${idx + 1}️⃣ *${slot}*\n`;
+            });
+            slotsText += `\nReply with option number (*1 to ${service.slots.length}*) or type custom time.`;
+
             return {
-                type: 'INTERACTIVE_LIST',
-                text: `📅 Date: *${preferredDate}*\n\nPlease select your preferred time slot for **${service.name}**:`,
-                listTitle: 'Choose Time Slot',
-                sections: [
-                    {
-                        title: 'Available Time Slots',
-                        rows: service.slots.map((slot, idx) => ({
-                            id: `SLOT_${idx}`,
-                            title: `🕘 ${slot}`,
-                            description: 'Professional available'
-                        }))
-                    }
-                ]
+                type: 'TEXT',
+                text: slotsText
             };
         }
 
         case 'SELECT_SLOT': {
             let slotName = '3:00 PM';
-            if (payloadData && payloadData.startsWith('SLOT_')) {
+            const service = state.data.service || SERVICES[0];
+            const slotIndex = parseInt(text, 10) - 1;
+
+            if (slotIndex >= 0 && slotIndex < service.slots.length) {
+                slotName = service.slots[slotIndex];
+            } else if (payloadData && payloadData.startsWith('SLOT_')) {
                 const idx = parseInt(payloadData.replace('SLOT_', ''), 10);
-                const slots = state.data.service ? state.data.service.slots : ['3:00 PM'];
-                slotName = slots[idx] || slotName;
+                slotName = service.slots[idx] || slotName;
             } else if (text) {
                 slotName = text;
             }
@@ -182,22 +154,18 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             state.data.patientDetails = text;
             state.step = 'CONFIRMATION';
 
-            const service = state.data.service;
+            const service = state.data.service || SERVICES[0];
             const price = service.basePrice;
 
             return {
-                type: 'INTERACTIVE_BUTTONS',
-                text: `📋 *Booking Summary & Quotation*\n\n• **Service**: ${service.name}\n• **Patient Details**: ${text}\n• **Pincode**: ${state.data.pincode}\n• **Date & Slot**: ${state.data.date} @ ${state.data.slot}\n• **Estimated Charges**: ₹${price}\n\nWould you like to confirm this booking?`,
-                buttons: [
-                    { id: 'CONFIRM_YES', text: '✅ Confirm & Book' },
-                    { id: 'CONFIRM_CANCEL', text: '❌ Cancel' }
-                ]
+                type: 'TEXT',
+                text: `📋 *Booking Summary & Quotation*\n\n• **Service**: ${service.name}\n• **Patient Details**: ${text}\n• **Pincode**: ${state.data.pincode}\n• **Date & Slot**: ${state.data.date} @ ${state.data.slot}\n• **Estimated Charges**: ₹${price}\n\n*Would you like to confirm this booking?*\n\n1️⃣ *Confirm & Book*\n2️⃣ *Cancel*\n\nReply *1* to confirm or *2* to cancel.`
             };
         }
 
         case 'CONFIRMATION': {
-            if (payloadData === 'CONFIRM_YES' || text.includes('yes') || text.includes('confirm')) {
-                const service = state.data.service;
+            if (text === '1' || payloadData === 'CONFIRM_YES' || text.includes('yes') || text.includes('confirm')) {
+                const service = state.data.service || SERVICES[0];
                 const newBooking = addBooking({
                     serviceId: service.id,
                     serviceName: service.name,
@@ -218,12 +186,8 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
                 return {
                     type: 'BOOKING_CONFIRMED',
-                    text: `✅ *BOOKING CONFIRMED*\n\n🆔 **Booking ID**: ${newBooking.id}\n📅 **Date**: ${newBooking.date}\n🕘 **Time Slot**: ${newBooking.slot}\n📍 **Location Pincode**: ${newBooking.pincode}\n👨‍⚕️ **Assigned Professional**: ${staffName}\n💰 **Total Amount**: ₹${newBooking.amount}\n💳 **Payment Status**: Pending (Pay on Service / Online UPI)\n\n📱 You will receive a WhatsApp reminder 1 hour before the visit.\n\n*Download PDF Invoice/Receipt below:*`,
-                    bookingId: newBooking.id,
-                    buttons: [
-                        { id: `PAY_UPI_${newBooking.id}`, text: '💳 Pay Online (UPI)' },
-                        { id: `TRACK_${newBooking.id}`, text: '📍 Track Professional' }
-                    ]
+                    text: `✅ *BOOKING CONFIRMED*\n\n🆔 **Booking ID**: ${newBooking.id}\n📅 **Date**: ${newBooking.date}\n🕘 **Time Slot**: ${newBooking.slot}\n📍 **Location Pincode**: ${newBooking.pincode}\n👨‍⚕️ **Assigned Professional**: ${staffName}\n💰 **Total Amount**: ₹${newBooking.amount}\n💳 **Payment Status**: Pending (Pay on Service / Online UPI)\n\n📱 You will receive a WhatsApp reminder 1 hour before the visit.`,
+                    bookingId: newBooking.id
                 };
             }
 
