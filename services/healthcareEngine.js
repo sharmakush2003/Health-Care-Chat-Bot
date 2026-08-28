@@ -144,7 +144,16 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         }
 
         case 'CAPTURE_PATIENT_DETAILS': {
-            state.data.patientDetails = text;
+            const input = (text || '').trim();
+            // Validate if age or numbers are provided
+            if (input.length < 3 || (!/\d/.test(input) && !input.toLowerCase().includes('yr') && !input.toLowerCase().includes('year'))) {
+                return {
+                    type: 'TEXT',
+                    text: `⚠️ *PATIENT AGE REQUIRED*\n----------------------------------------\nPlease specify both **Patient Name & Age** (e.g. *Ramesh Sharma, 54 yrs* or *Priya, 30 years*):`
+                };
+            }
+
+            state.data.patientDetails = input;
             state.step = 'CONFIRMATION';
 
             const service = state.data.service || SERVICES[0];
@@ -152,7 +161,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `📋 *HEALTH SAATHI BOOKING QUOTATION*\n----------------------------------------\n• *Service*: ${service.name}\n• *Patient*: ${text}\n• *Location Pincode*: ${state.data.pincode}\n• *Scheduled Visit*: ${state.data.date} @ ${state.data.slot}\n• *Estimated Charges*: *₹${price}*\n----------------------------------------\n*Would you like to confirm this booking?*\n\n1️⃣  ✅ *Confirm & Book Now*\n2️⃣  ❌ *Cancel*\n----------------------------------------\n📲 *Reply 1 to Confirm or 2 to Cancel.*`
+                text: `📋 *HEALTH SAATHI BOOKING QUOTATION*\n----------------------------------------\n• *Service*: ${service.name}\n• *Patient*: ${input}\n• *Location Pincode*: ${state.data.pincode}\n• *Scheduled Visit*: ${state.data.date} @ ${state.data.slot}\n• *Estimated Charges*: *₹${price}*\n----------------------------------------\n*Would you like to confirm this booking?*\n\n1️⃣  ✅ *Confirm & Book Now*\n2️⃣  ❌ *Cancel*\n----------------------------------------\n📲 *Reply 1 to Confirm or 2 to Cancel.*`
             };
         }
 
@@ -178,11 +187,11 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 // Reset state
                 CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
 
-                const staffName = newBooking.assignedStaff ? `${newBooking.assignedStaff.name} (${newBooking.assignedStaff.phone})` : 'Allocating nearby specialist...';
+                const staffName = newBooking.assignedStaff ? `${newBooking.assignedStaff.name} (${newBooking.assignedStaff.phone})` : '🟡 Pending Staff Allocation (Admin will allocate nearby specialist)';
 
                 return {
                     type: 'BOOKING_CONFIRMED',
-                    text: `✅ *BOOKING CONFIRMED & ALLOCATED*\n----------------------------------------\n🆔 *Booking ID*: *${newBooking.id}*\n🩺 *Service*: ${newBooking.serviceName}\n👤 *Patient*: ${newBooking.patientName}\n📅 *Scheduled Date*: ${newBooking.date}\n🕘 *Time Slot*: ${newBooking.slot}\n📍 *Pincode*: ${newBooking.pincode}\n👨‍⚕️ *Assigned Professional*: ${staffName}\n💰 *Total Amount*: ₹${newBooking.amount}\n💳 *Payment*: Pending (Pay on Visit / Online UPI)\n----------------------------------------\n📱 *A WhatsApp reminder will be sent 1 hour before the visit.*`,
+                    text: `✅ *BOOKING RECEIVED & PENDING ALLOCATION*\n----------------------------------------\n🆔 *Booking ID*: *${newBooking.id}*\n🩺 *Service*: ${newBooking.serviceName}\n👤 *Patient*: ${newBooking.patientName}\n📅 *Scheduled Date*: ${newBooking.date}\n🕘 *Time Slot*: ${newBooking.slot}\n📍 *Pincode*: ${newBooking.pincode}\n👨‍⚕️ *Assigned Professional*: ${staffName}\n💰 *Total Amount*: ₹${newBooking.amount}\n💳 *Payment*: Pending (Pay on Visit / Online UPI)\n----------------------------------------\n📱 *A WhatsApp reminder will be sent 1 hour before the visit.*`,
                     bookingId: newBooking.id
                 };
             }

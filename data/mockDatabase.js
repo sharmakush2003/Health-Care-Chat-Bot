@@ -149,15 +149,9 @@ export function addBooking(bookingData) {
         amount: bookingData.amount || 900,
         paymentStatus: bookingData.paymentStatus || 'Pending',
         status: 'Pending Assignment',
-        assignedStaff: null,
+        assignedStaff: null, // Always pending manual staff assignment by admin!
         createdAt: new Date().toISOString()
     };
-
-    const availableStaff = STAFF_POOL.find(s => s.category === bookingData.category && s.available);
-    if (availableStaff) {
-        newBooking.assignedStaff = { id: availableStaff.id, name: availableStaff.name, phone: availableStaff.phone };
-        newBooking.status = 'Assigned';
-    }
 
     BOOKINGS.unshift(newBooking);
     saveDB();

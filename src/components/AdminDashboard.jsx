@@ -276,8 +276,8 @@ export default function AdminDashboard() {
                                                 rel="noreferrer"
                                                 className="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-teal-700 text-xs font-bold px-3.5 py-1.5 rounded-xl border border-slate-300 transition"
                                             >
-                                                <Download className="w-3.5 h-3.5" />
-                                                <span>PDF Receipt</span>
+                                                <FileText className="w-3.5 h-3.5 text-teal-600" />
+                                                <span>Preview PDF</span>
                                             </a>
                                         </td>
                                     </tr>
