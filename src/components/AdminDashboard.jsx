@@ -4,37 +4,28 @@ import { Activity, Users, Calendar, AlertTriangle, CheckCircle, Clock, Truck, Sh
 export default function AdminDashboard() {
     const [stats, setStats] = useState(null);
     const [bookings, setBookings] = useState([]);
-    const [messages, setMessages] = useState([]);
     const [staff, setStaff] = useState([]);
     const [emergencyAlerts, setEmergencyAlerts] = useState([]);
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [loading, setLoading] = useState(false);
 
-    // Quick Webhook Message Simulator State
-    const [simPhone, setSimPhone] = useState('918233816674');
-    const [simMessage, setSimMessage] = useState('');
-    const [simSending, setSimSending] = useState(false);
-
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [statsRes, bookingsRes, messagesRes, staffRes, emergencyRes] = await Promise.all([
+            const [statsRes, bookingsRes, staffRes, emergencyRes] = await Promise.all([
                 fetch('/api/stats'),
                 fetch('/api/bookings'),
-                fetch('/api/messages'),
                 fetch('/api/staff'),
                 fetch('/api/emergency')
             ]);
 
             const statsData = await statsRes.json();
             const bookingsData = await bookingsRes.json();
-            const messagesData = await messagesRes.json();
             const staffData = await staffRes.json();
             const emergencyData = await emergencyRes.json();
 
             setStats(statsData.stats);
             setBookings(bookingsData.bookings || []);
-            setMessages(messagesData.messages || []);
             setStaff(staffData.staff || []);
             setEmergencyAlerts(emergencyData.alerts || []);
         } catch (err) {
@@ -63,28 +54,6 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleSendTestWebhook = async (textToSend) => {
-        const text = textToSend || simMessage;
-        if (!text) return;
-        setSimSending(true);
-        try {
-            await fetch('/api/simulate-chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    phone: simPhone,
-                    message: text
-                })
-            });
-            setSimMessage('');
-            fetchData();
-        } catch (err) {
-            console.error('Webhook simulation failed:', err);
-        } finally {
-            setSimSending(false);
-        }
-    };
-
     const filteredBookings = filterStatus === 'ALL'
         ? bookings
         : bookings.filter(b => b.status === filterStatus);
@@ -105,7 +74,7 @@ export default function AdminDashboard() {
                             </span>
                         </h1>
                         <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
-                            Live Patient WhatsApp Messages • Automated Flow • Staff Assignment • Medical Bookings
+                            Real-Time WhatsApp Bookings • Automated Patient Allocation • Staff Roster • Invoices
                         </p>
                     </div>
                 </div>
@@ -163,34 +132,34 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-teal-300 transition">
                         <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <span>WhatsApp Enquiries</span>
-                            <MessageSquare className="w-4 h-4 text-teal-600" />
-                        </div>
-                        <div className="text-3xl font-extrabold text-slate-900 mt-2">{stats.totalEnquiries}</div>
-                        <div className="text-xs text-teal-600 font-medium mt-1">Live Messages Received</div>
-                    </div>
-
-                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-teal-300 transition">
-                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <span>Total Patient Bookings</span>
-                            <Calendar className="w-4 h-4 text-blue-600" />
+                            <span>Total WhatsApp Bookings</span>
+                            <Calendar className="w-4 h-4 text-teal-600" />
                         </div>
                         <div className="text-3xl font-extrabold text-slate-900 mt-2">{stats.todaysBookings}</div>
-                        <div className="text-xs text-blue-600 font-medium mt-1">Confirmed Patients</div>
+                        <div className="text-xs text-teal-600 font-medium mt-1">Confirmed Patient Bookings</div>
                     </div>
 
                     <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-amber-300 transition">
                         <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <span>Pending Staff</span>
+                            <span>Pending Allocation</span>
                             <Clock className="w-4 h-4 text-amber-500" />
                         </div>
                         <div className="text-3xl font-extrabold text-amber-600 mt-2">{stats.pendingAssignment}</div>
-                        <div className="text-xs text-amber-700 font-medium mt-1">Awaiting Allocation</div>
+                        <div className="text-xs text-amber-700 font-medium mt-1">Awaiting Nurse / Specialist</div>
+                    </div>
+
+                    <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-blue-300 transition">
+                        <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
+                            <span>Assigned Staff</span>
+                            <Users className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div className="text-3xl font-extrabold text-blue-600 mt-2">{stats.assigned + stats.onTheWay}</div>
+                        <div className="text-xs text-blue-600 font-medium mt-1">Active Professionals</div>
                     </div>
 
                     <div className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:border-emerald-300 transition">
                         <div className="flex items-center justify-between text-slate-500 text-xs font-bold uppercase tracking-wider">
-                            <span>Service Revenue</span>
+                            <span>Total Booking Value</span>
                             <Activity className="w-4 h-4 text-emerald-600" />
                         </div>
                         <div className="text-3xl font-extrabold text-slate-900 mt-2">₹{stats.totalRevenue}</div>
@@ -199,211 +168,127 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* Main Content Layout: Live WhatsApp Inbox (Left) + Medical Bookings Pipeline (Right) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                {/* LIVE WHATSAPP MESSAGES FEED & TEST SIMULATOR */}
-                <div className="lg:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col h-[680px]">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div className="flex items-center space-x-2">
-                            <MessageSquare className="w-5 h-5 text-teal-600" />
-                            <h2 className="font-bold text-slate-900 text-base">Live WhatsApp Messages Feed</h2>
+            {/* FULL WIDTH MEDICAL BOOKINGS MANAGEMENT PIPELINE */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold border border-blue-200">
+                            <Calendar className="w-4 h-4" />
                         </div>
-                        <span className="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-200">
-                            Auto-Replied (WhatsApp API)
-                        </span>
+                        <div>
+                            <h2 className="font-bold text-slate-900 text-lg">Patient Bookings & Allocation Pipeline</h2>
+                            <p className="text-xs text-slate-500">Real-Time Patient Bookings received via WhatsApp Cloud API</p>
+                        </div>
                     </div>
 
-                    {/* Quick Trigger Preset Buttons */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                        <span className="text-slate-400 font-semibold shrink-0">Simulate:</span>
-                        <button
-                            onClick={() => handleSendTestWebhook('hi')}
-                            className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 shrink-0 font-medium"
-                        >
-                            👋 Send "Hi"
-                        </button>
-                        <button
-                            onClick={() => handleSendTestWebhook('3')}
-                            className="bg-teal-50 hover:bg-teal-100 text-teal-700 px-2.5 py-1 rounded-lg border border-teal-200 shrink-0 font-medium"
-                        >
-                            🏥 Book Physio
-                        </button>
-                        <button
-                            onClick={() => handleSendTestWebhook('Severe chest pain')}
-                            className="bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1 rounded-lg border border-rose-200 shrink-0 font-medium"
-                        >
-                            🚨 Emergency
-                        </button>
-                    </div>
-
-                    {/* Messages Scroll Area */}
-                    <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-                        {messages.length === 0 ? (
-                            <div className="text-center py-16 text-slate-400 text-sm space-y-2">
-                                <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
-                                <p className="font-semibold text-slate-600">No Live WhatsApp Messages Yet</p>
-                                <p className="text-xs text-slate-400">Send a WhatsApp message from your phone to see live conversations here.</p>
-                            </div>
-                        ) : (
-                            messages.map((msg) => (
-                                <div key={msg.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs hover:border-teal-300 transition">
-                                    {/* Incoming Patient Message */}
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center space-x-2">
-                                            <span className="font-bold text-slate-900 text-sm">{msg.senderName}</span>
-                                            <span className="text-[11px] text-slate-400 font-mono">({msg.phone})</span>
-                                        </div>
-                                        <span className="text-[10px] text-slate-400 font-mono">{msg.timestamp}</span>
-                                    </div>
-                                    <div className="bg-white p-2.5 rounded-lg border border-slate-200 font-medium text-slate-800 text-xs">
-                                        📩 Patient: "{msg.userMessage}"
-                                    </div>
-
-                                    {/* Bot Auto Reply */}
-                                    <div className="bg-teal-50/80 p-2.5 rounded-lg border border-teal-200 text-teal-900 text-[11px] whitespace-pre-line leading-relaxed">
-                                        <div className="font-semibold text-teal-800 flex items-center justify-between mb-1">
-                                            <span>🤖 Health Saathi Bot (Auto-Reply):</span>
-                                            <CheckCheck className="w-3.5 h-3.5 text-teal-600" />
-                                        </div>
-                                        {msg.botReplyText}
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    {/* Send Custom Webhook Message Box */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center space-x-2">
-                        <input
-                            type="text"
-                            value={simMessage}
-                            onChange={(e) => setSimMessage(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSendTestWebhook()}
-                            placeholder="Type test patient message (e.g. 'book nurse')..."
-                            className="flex-1 bg-slate-50 text-slate-900 placeholder-slate-400 text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-teal-500 focus:bg-white"
-                        />
-                        <button
-                            onClick={() => handleSendTestWebhook()}
-                            disabled={simSending}
-                            className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition flex items-center space-x-1 shrink-0"
-                        >
-                            <Send className="w-3.5 h-3.5" />
-                            <span>{simSending ? 'Sending...' : 'Send'}</span>
-                        </button>
+                    {/* Status Filter Pills */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto text-xs">
+                        {['ALL', 'Pending Assignment', 'Assigned', 'On the way', 'Completed'].map((st) => (
+                            <button
+                                key={st}
+                                onClick={() => setFilterStatus(st)}
+                                className={`px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap text-xs ${filterStatus === st
+                                        ? 'bg-teal-600 text-white shadow-sm'
+                                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                                    }`}
+                            >
+                                {st}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
-                {/* MEDICAL BOOKINGS MANAGEMENT PIPELINE */}
-                <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col h-[680px]">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                        <div className="flex items-center space-x-2">
-                            <Calendar className="w-5 h-5 text-blue-600" />
-                            <h2 className="font-bold text-slate-900 text-base">Patient Bookings & Allocation Pipeline</h2>
-                        </div>
-
-                        {/* Status Filter Pills */}
-                        <div className="flex items-center gap-1 overflow-x-auto text-xs">
-                            {['ALL', 'Pending Assignment', 'Assigned', 'On the way', 'Completed'].map((st) => (
-                                <button
-                                    key={st}
-                                    onClick={() => setFilterStatus(st)}
-                                    className={`px-2.5 py-1 rounded-lg font-bold transition whitespace-nowrap ${filterStatus === st
-                                            ? 'bg-teal-600 text-white shadow-sm'
-                                            : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                                        }`}
-                                >
-                                    {st}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Bookings Table */}
-                    <div className="flex-1 overflow-y-auto border border-slate-200 rounded-xl">
-                        <table className="w-full text-left text-xs text-slate-700">
-                            <thead className="text-[11px] font-bold uppercase bg-slate-100 text-slate-600 border-b border-slate-200 sticky top-0">
+                {/* Bookings Table */}
+                <div className="overflow-x-auto border border-slate-200 rounded-xl">
+                    <table className="w-full text-left text-xs text-slate-700">
+                        <thead className="text-[11px] font-bold uppercase bg-slate-100 text-slate-600 border-b border-slate-200">
+                            <tr>
+                                <th className="p-3.5">Booking ID</th>
+                                <th className="p-3.5">Service & Patient Details</th>
+                                <th className="p-3.5">Scheduled Date & Slot</th>
+                                <th className="p-3.5">Assigned Staff</th>
+                                <th className="p-3.5">Pipeline Status</th>
+                                <th className="p-3.5 text-right">PDF Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {filteredBookings.length === 0 ? (
                                 <tr>
-                                    <th className="p-3">Booking ID</th>
-                                    <th className="p-3">Service & Patient</th>
-                                    <th className="p-3">Date & Slot</th>
-                                    <th className="p-3">Assigned Staff</th>
-                                    <th className="p-3">Status</th>
-                                    <th className="p-3 text-right">PDF Invoice</th>
+                                    <td colSpan="6" className="p-16 text-center text-slate-400">
+                                        <div className="flex flex-col items-center justify-center space-y-2">
+                                            <Calendar className="w-10 h-10 text-slate-300" />
+                                            <p className="font-bold text-slate-700 text-sm">No Bookings Match Selected Filter</p>
+                                            <p className="text-xs text-slate-400 max-w-sm">
+                                                When a patient completes a booking on WhatsApp (selecting a service, date, slot, and details), it will automatically appear here in real time!
+                                            </p>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredBookings.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" className="p-12 text-center text-slate-400">
-                                            No bookings match the selected status filter.
+                            ) : (
+                                filteredBookings.map((b) => (
+                                    <tr key={b.id} className="hover:bg-slate-50 transition">
+                                        <td className="p-3.5 font-mono font-bold text-teal-700 text-sm">{b.id}</td>
+                                        <td className="p-3.5">
+                                            <div className="font-bold text-slate-900 text-sm">{b.serviceName}</div>
+                                            <div className="text-xs text-slate-600 font-medium">{b.patientName} • <span className="font-mono text-slate-500">{b.phone}</span></div>
+                                            <div className="text-[11px] text-slate-400 font-mono">Location Pincode: {b.pincode}</div>
+                                        </td>
+                                        <td className="p-3.5 text-xs">
+                                            <div className="font-semibold text-slate-800">{b.date}</div>
+                                            <div className="text-teal-600 font-mono font-bold">{b.slot}</div>
+                                        </td>
+                                        <td className="p-3.5 text-xs">
+                                            {b.assignedStaff ? (
+                                                <div>
+                                                    <div className="font-bold text-emerald-700">{b.assignedStaff.name}</div>
+                                                    <div className="text-[11px] text-slate-400 font-mono">{b.assignedStaff.phone}</div>
+                                                </div>
+                                            ) : (
+                                                <select
+                                                    onChange={(e) => handleUpdateStatus(b.id, 'Assigned', e.target.value)}
+                                                    defaultValue=""
+                                                    className="bg-amber-50 text-amber-800 text-xs font-bold border border-amber-300 rounded-lg px-2.5 py-1 focus:outline-none"
+                                                >
+                                                    <option value="" disabled>Assign Staff...</option>
+                                                    {staff.map(s => (
+                                                        <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
+                                                    ))}
+                                                </select>
+                                            )}
+                                        </td>
+                                        <td className="p-3.5">
+                                            <select
+                                                value={b.status}
+                                                onChange={(e) => handleUpdateStatus(b.id, e.target.value)}
+                                                className="bg-white border border-slate-300 text-slate-800 font-bold text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-teal-500 shadow-sm"
+                                            >
+                                                <option value="Pending Assignment">🟡 Pending Assignment</option>
+                                                <option value="Assigned">🟢 Assigned</option>
+                                                <option value="On the way">🚗 On the way</option>
+                                                <option value="In Progress">🏥 In Progress</option>
+                                                <option value="Completed">✅ Completed</option>
+                                            </select>
+                                        </td>
+                                        <td className="p-3.5 text-right">
+                                            <a
+                                                href={`/api/bookings/${b.id}/invoice`}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-slate-200 text-teal-700 text-xs font-bold px-3.5 py-1.5 rounded-xl border border-slate-300 transition"
+                                            >
+                                                <Download className="w-3.5 h-3.5" />
+                                                <span>PDF Receipt</span>
+                                            </a>
                                         </td>
                                     </tr>
-                                ) : (
-                                    filteredBookings.map((b) => (
-                                        <tr key={b.id} className="hover:bg-slate-50 transition">
-                                            <td className="p-3 font-mono font-bold text-teal-700">{b.id}</td>
-                                            <td className="p-3">
-                                                <div className="font-bold text-slate-900">{b.serviceName}</div>
-                                                <div className="text-[11px] text-slate-500">{b.patientName} ({b.phone})</div>
-                                                <div className="text-[10px] text-slate-400">Pincode: {b.pincode}</div>
-                                            </td>
-                                            <td className="p-3 text-[11px]">
-                                                <div className="font-semibold text-slate-800">{b.date}</div>
-                                                <div className="text-teal-600 font-mono font-bold">{b.slot}</div>
-                                            </td>
-                                            <td className="p-3 text-[11px]">
-                                                {b.assignedStaff ? (
-                                                    <div>
-                                                        <div className="font-bold text-emerald-700">{b.assignedStaff.name}</div>
-                                                        <div className="text-[10px] text-slate-400">{b.assignedStaff.phone}</div>
-                                                    </div>
-                                                ) : (
-                                                    <select
-                                                        onChange={(e) => handleUpdateStatus(b.id, 'Assigned', e.target.value)}
-                                                        defaultValue=""
-                                                        className="bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-300 rounded-lg px-2 py-1 focus:outline-none"
-                                                    >
-                                                        <option value="" disabled>Assign Staff...</option>
-                                                        {staff.map(s => (
-                                                            <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
-                                                        ))}
-                                                    </select>
-                                                )}
-                                            </td>
-                                            <td className="p-3">
-                                                <select
-                                                    value={b.status}
-                                                    onChange={(e) => handleUpdateStatus(b.id, e.target.value)}
-                                                    className="bg-white border border-slate-300 text-slate-800 font-semibold text-[11px] rounded-lg px-2 py-1 focus:outline-none focus:border-teal-500"
-                                                >
-                                                    <option value="Pending Assignment">Pending Assignment</option>
-                                                    <option value="Assigned">Assigned</option>
-                                                    <option value="On the way">On the way</option>
-                                                    <option value="In Progress">In Progress</option>
-                                                    <option value="Completed">Completed</option>
-                                                </select>
-                                            </td>
-                                            <td className="p-3 text-right">
-                                                <a
-                                                    href={`/api/bookings/${b.id}/invoice`}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="inline-flex items-center space-x-1 bg-slate-100 hover:bg-slate-200 text-teal-700 text-[11px] font-bold px-2.5 py-1.5 rounded-lg border border-slate-300 transition"
-                                                >
-                                                    <Download className="w-3 h-3" />
-                                                    <span>PDF</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            {/* STAFF DIRECTORY ROSTER & META WEBHOOK INFO (CLEAN WHITE CARDS) */}
+            {/* STAFF DIRECTORY ROSTER & META WEBHOOK SPEC */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Staff Roster */}
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
@@ -413,7 +298,7 @@ export default function AdminDashboard() {
                             Verified Healthcare Staff Roster
                         </h3>
                         <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-semibold">
-                            {staff.length} Active
+                            {staff.length} Active Professionals
                         </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
