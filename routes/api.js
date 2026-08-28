@@ -46,7 +46,7 @@ router.get('/stats', (req, res) => {
     const bookings = getBookings();
     const messages = getLiveMessages();
     const stats = {
-        totalEnquiries: messages.length + 10,
+        totalEnquiries: messages.length,
         todaysBookings: bookings.length,
         pendingAssignment: bookings.filter(b => b.status === 'Pending Assignment').length,
         assigned: bookings.filter(b => b.status === 'Assigned').length,
