@@ -99,9 +99,9 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            Khaira Medical Chatbot
+                            Health Saathi Chatbot
                             <span className="bg-teal-50 text-teal-700 text-xs px-2.5 py-1 rounded-full font-semibold border border-teal-200">
-                                Meta WhatsApp Cloud API ERP
+                                by AutomateX.co.in
                             </span>
                         </h1>
                         <p className="text-slate-500 text-xs sm:text-sm mt-0.5">

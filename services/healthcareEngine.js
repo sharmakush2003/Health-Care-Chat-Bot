@@ -52,7 +52,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             state.step = 'MAIN_MENU';
             return {
                 type: 'TEXT',
-                text: `👋 *Welcome to AutomateX Home Healthcare Services*\n\nWe provide professional doctor-guided healthcare services directly at your home.\n\n*How can we help you today? Please reply with a number (1 to 7):*\n\n1️⃣ *Nursing at Home* (₹800/visit or ₹1,500/12-hr)\n2️⃣ *Caretaker at Home* (₹1,200/12-hr or ₹2,000/24-hr)\n3️⃣ *Physiotherapy at Home* (₹900/45-min session)\n4️⃣ *Lab Test / Sample Collection* (Starts @ ₹500)\n5️⃣ *ECG at Home* (₹1,100 per test)\n6️⃣ *Pricing & Service Information*\n7️⃣ *Check Existing Booking Status*\n\nReply with option number (*1 to 7*) to proceed.`
+                text: `👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\nWe provide professional doctor-guided home healthcare services directly at your doorstep.\n\n*How can we help you today? Please reply with a number (1 to 7):*\n\n1️⃣ *Nursing at Home* (₹800/visit or ₹1,500/12-hr)\n2️⃣ *Caretaker at Home* (₹1,200/12-hr or ₹2,000/24-hr)\n3️⃣ *Physiotherapy at Home* (₹900/45-min session)\n4️⃣ *Lab Test / Sample Collection* (Starts @ ₹500)\n5️⃣ *ECG at Home* (₹1,100 per test)\n6️⃣ *Pricing & Service Information*\n7️⃣ *Check Existing Booking Status*\n\nReply with option number (*1 to 7*) to proceed.`
             };
         }
 
@@ -68,7 +68,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             else if (text === '6' || payloadData === 'OPT_PRICING') {
                 return {
                     type: 'TEXT',
-                    text: `💰 *AutomateX Healthcare Service Tariff*\n\n1️⃣ *Nursing at Home*: ₹800 / visit or ₹1,500 / 12-hr shift\n2️⃣ *Caretaker at Home*: ₹1,200 / 12-hr or ₹2,000 / 24-hr\n3️⃣ *Physiotherapy at Home*: ₹900 / 45-min session\n4️⃣ *Lab Test / Sample Collection*: Starts @ ₹500\n5️⃣ *ECG at Home*: ₹1,100 / digital report\n\nReply with *1 to 5* to book a service or *0* for main menu.`
+                    text: `💰 *Health Saathi Tariff Card (AutomateX.co.in)*\n\n1️⃣ *Nursing at Home*: ₹800 / visit or ₹1,500 / 12-hr shift\n2️⃣ *Caretaker at Home*: ₹1,200 / 12-hr or ₹2,000 / 24-hr\n3️⃣ *Physiotherapy at Home*: ₹900 / 45-min session\n4️⃣ *Lab Test / Sample Collection*: Starts @ ₹500\n5️⃣ *ECG at Home*: ₹1,100 / digital report\n\nReply with *1 to 5* to book a service or *0* for main menu.`
                 };
             } else if (text === '7' || payloadData === 'OPT_STATUS') {
                 state.step = 'CHECK_STATUS';

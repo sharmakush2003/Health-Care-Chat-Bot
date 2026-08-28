@@ -56,14 +56,14 @@ app.use(express.static(distPath));
 app.get('/health', (req, res) => {
     res.json({
         status: 'UP',
-        service: 'Khaira Medical WhatsApp Bot & ERP Backend',
+        service: 'Health Saathi WhatsApp Bot & ERP Backend by AutomateX.co.in',
         timestamp: new Date().toISOString()
     });
 });
 
 app.listen(PORT, () => {
     console.log(`\n======================================================`);
-    console.log(`🏥 Khaira Medical WhatsApp Bot Server Running on Port ${PORT}`);
+    console.log(`🏥 Health Saathi WhatsApp Bot Server Running on Port ${PORT}`);
     console.log(`📲 Meta Webhook Verification URL: http://localhost:${PORT}/api/webhook`);
     console.log(`📊 Admin REST API URL: http://localhost:${PORT}/api/stats`);
     console.log(`======================================================\n`);

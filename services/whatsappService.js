@@ -20,7 +20,7 @@ export async function sendWhatsAppMessage(recipientPhone, messagePayload, pdfUrl
     const wabaId = process.env.META_WABA_ID || 'MOCK_WABA';
 
     // Extract text body
-    let replyText = 'Khaira Medical Support';
+    let replyText = 'Health Saathi Chatbot by AutomateX.co.in';
     if (typeof messagePayload === 'string') {
         replyText = messagePayload;
     } else if (messagePayload && messagePayload.text) {
@@ -38,7 +38,7 @@ export async function sendWhatsAppMessage(recipientPhone, messagePayload, pdfUrl
                 type: 'interactive',
                 interactive: {
                     type: 'list',
-                    header: { type: 'text', text: 'Khaira Medical Services' },
+                    header: { type: 'text', text: 'Health Saathi - AutomateX.co.in' },
                     body: { text: replyText },
                     action: {
                         button: messagePayload.listTitle || 'Select Service',

@@ -18,10 +18,10 @@ export function generateBookingPDF(booking) {
             // Header Banner
             doc.fillColor('#0f766e')
                 .fontSize(22)
-                .text('AutomateX.ai Healthcare Services', { align: 'left' });
+                .text('Health Saathi Chatbot', { align: 'left' });
             doc.fontSize(10)
                 .fillColor('#64748b')
-                .text('Doctor-Guided Home Care | WhatsApp Verified Booking', { align: 'left' });
+                .text('by AutomateX.co.in | Doctor-Guided Home Care Receipt', { align: 'left' });
             doc.moveDown(1.5);
 
             // Divider

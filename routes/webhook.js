@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
         }
         return res.sendStatus(403);
     }
-    res.status(200).send('Khaira Medical Webhook Listener Ready');
+    res.status(200).send('Health Saathi Webhook Listener Ready (AutomateX.co.in)');
 });
 
 /**
