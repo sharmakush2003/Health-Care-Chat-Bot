@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: healthcare-chatbot-bot
+    name: garments-retailing-erp-bot
     env: node
     buildCommand: npm install && npm run build
     startCommand: node server.js
