@@ -1,0 +1,15 @@
+{
+  "bookings": [],
+  "emergencyAlerts": [],
+  "liveMessages": [
+    {
+      "id": "MSG-6233",
+      "phone": "918233816674",
+      "senderName": "Patient (Test) (918233816674)",
+      "userMessage": "hi",
+      "botReplyText": "👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\n🩺 *Doctor-Guided Home Healthcare Services*\n----------------------------------------\nWe deliver certified nursing, physiotherapy, caretaker, and diagnostic services directly to your doorstep.\n\n📋 *HOW CAN WE HELP YOU TODAY?*\nPlease reply with a number (*1 to 7*) to select:\n\n1️⃣  *Nursing at Home*\n     └ ₹800 / visit  •  ₹1,500 / 12-hr shift\n\n2️⃣  *Caretaker at Home*\n     └ ₹1,200 / 12-hr  •  ₹2,000 / 24-hr\n\n3️⃣  *Physiotherapy at Home*\n     └ ₹900 / 45-min expert session\n\n4️⃣  *Lab Test / Sample Collection*\n     └ Starts @ ₹500  (Free home collection)\n\n5️⃣  *ECG at Home*\n     └ ₹1,100 / test (Instant digital report)\n\n6️⃣  *Full Tariff Card & Information*\n7️⃣  *Check Booking Status / Track Professional*\n----------------------------------------\n📲 *Reply with option number (1 to 7) to proceed*",
+      "timestamp": "10:06 pm",
+      "status": "Auto Replied (WhatsApp Cloud API)"
+    }
+  ]
+}

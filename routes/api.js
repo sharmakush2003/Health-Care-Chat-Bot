@@ -7,43 +7,61 @@ import { generateBookingPDF } from '../services/pdfGenerator.js';
 const router = express.Router();
 const RENDER_LIVE_URL = 'https://garments-erp-bot.onrender.com';
 
-// Get all bookings (with fallback to live Render server if local DB is empty)
+// Helper to check if running in Render environment
+const isRender = !!process.env.RENDER;
+
+// Get all bookings (always fetch live from Render if running locally)
 router.get('/bookings', async (req, res) => {
     let localBookings = getBookings();
-    if (localBookings.length === 0 && !process.env.RENDER) {
+    if (!isRender) {
         try {
-            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/bookings`, { timeout: 3000 });
-            if (remoteRes.data && Array.isArray(remoteRes.data.bookings) && remoteRes.data.bookings.length > 0) {
-                return res.json({ bookings: remoteRes.data.bookings });
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/bookings`, { timeout: 4000 });
+            if (remoteRes.data && Array.isArray(remoteRes.data.bookings)) {
+                // Combine remote live bookings with local bookings (deduplicating by ID)
+                const map = new Map();
+                remoteRes.data.bookings.forEach(b => map.set(b.id, b));
+                localBookings.forEach(b => map.set(b.id, b));
+                return res.json({ bookings: Array.from(map.values()) });
             }
         } catch (e) {
-            // Ignore offline/timeout errors
+            console.error('[Live Sync Bookings Error]:', e.message);
         }
     }
     res.json({ bookings: localBookings });
 });
 
-// Get live WhatsApp message feed (with fallback to live Render server if local DB is empty)
+// Get live WhatsApp message feed (always fetch live from Render if running locally)
 router.get('/messages', async (req, res) => {
     let localMessages = getLiveMessages();
-    if (localMessages.length === 0 && !process.env.RENDER) {
+    if (!isRender) {
         try {
-            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/messages`, { timeout: 3000 });
-            if (remoteRes.data && Array.isArray(remoteRes.data.messages) && remoteRes.data.messages.length > 0) {
-                return res.json({ messages: remoteRes.data.messages });
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/messages`, { timeout: 4000 });
+            if (remoteRes.data && Array.isArray(remoteRes.data.messages)) {
+                // Combine remote live messages with local messages (deduplicating by ID)
+                const map = new Map();
+                remoteRes.data.messages.forEach(m => map.set(m.id, m));
+                localMessages.forEach(m => map.set(m.id, m));
+                return res.json({ messages: Array.from(map.values()) });
             }
         } catch (e) {
-            // Ignore offline/timeout errors
+            console.error('[Live Sync Messages Error]:', e.message);
         }
     }
     res.json({ messages: localMessages });
 });
 
 // Update booking status / staff
-router.put('/bookings/:id', (req, res) => {
+router.put('/bookings/:id', async (req, res) => {
     const { id } = req.params;
     const { status, staffId } = req.body;
     const updated = updateBookingStatus(id, status, staffId);
+
+    if (!isRender) {
+        try {
+            await axios.put(`${RENDER_LIVE_URL}/api/bookings/${id}`, { status, staffId }, { timeout: 4000 });
+        } catch (e) {}
+    }
+
     if (updated) {
         return res.json({ success: true, booking: updated });
     }
@@ -60,35 +78,45 @@ router.get('/services', (req, res) => {
     res.json({ services: SERVICES });
 });
 
-// Get emergency alerts
-router.get('/emergency', (req, res) => {
-    res.json({ alerts: EMERGENCY_ALERTS });
+// Get emergency alerts (always fetch live from Render if running locally)
+router.get('/emergency', async (req, res) => {
+    let localAlerts = EMERGENCY_ALERTS;
+    if (!isRender) {
+        try {
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/emergency`, { timeout: 4000 });
+            if (remoteRes.data && Array.isArray(remoteRes.data.alerts)) {
+                const map = new Map();
+                remoteRes.data.alerts.forEach(a => map.set(a.id, a));
+                localAlerts.forEach(a => map.set(a.id, a));
+                return res.json({ alerts: Array.from(map.values()) });
+            }
+        } catch (e) {}
+    }
+    res.json({ alerts: localAlerts });
 });
 
-// Get Dashboard KPI Metrics (with fallback to live Render server)
+// Get Dashboard KPI Metrics (always fetch live from Render if running locally)
 router.get('/stats', async (req, res) => {
-    const bookings = getBookings();
-    const messages = getLiveMessages();
+    let localMessages = getLiveMessages();
+    let localBookings = getBookings();
 
-    if (messages.length === 0 && !process.env.RENDER) {
+    if (!isRender) {
         try {
-            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/stats`, { timeout: 3000 });
-            if (remoteRes.data && remoteRes.data.stats && remoteRes.data.stats.totalEnquiries > 0) {
+            const remoteRes = await axios.get(`${RENDER_LIVE_URL}/api/stats`, { timeout: 4000 });
+            if (remoteRes.data && remoteRes.data.stats) {
                 return res.json({ stats: remoteRes.data.stats });
             }
-        } catch (e) {
-            // Ignore offline/timeout errors
-        }
+        } catch (e) {}
     }
 
     const stats = {
-        totalEnquiries: messages.length,
-        todaysBookings: bookings.length,
-        pendingAssignment: bookings.filter(b => b.status === 'Pending Assignment').length,
-        assigned: bookings.filter(b => b.status === 'Assigned').length,
-        onTheWay: bookings.filter(b => b.status === 'On the way').length,
-        completed: bookings.filter(b => b.status === 'Completed').length,
-        totalRevenue: bookings.reduce((sum, b) => sum + (b.amount || 0), 0),
+        totalEnquiries: localMessages.length,
+        todaysBookings: localBookings.length,
+        pendingAssignment: localBookings.filter(b => b.status === 'Pending Assignment').length,
+        assigned: localBookings.filter(b => b.status === 'Assigned').length,
+        onTheWay: localBookings.filter(b => b.status === 'On the way').length,
+        completed: localBookings.filter(b => b.status === 'Completed').length,
+        totalRevenue: localBookings.reduce((sum, b) => sum + (b.amount || 0), 0),
         emergencyAlertsCount: EMERGENCY_ALERTS.length
     };
     res.json({ stats });
@@ -118,14 +146,13 @@ router.post('/simulate-chat', async (req, res) => {
     const botReply = processHealthcareMessage(userPhone, message, payload);
     const newMsg = addLiveWhatsAppMessage(userPhone, message, botReply.text, 'Patient (Test)');
 
-    // Also forward simulation to Render if running locally so Render stores it too!
-    if (!process.env.RENDER) {
+    if (!isRender) {
         try {
             await axios.post(`${RENDER_LIVE_URL}/api/simulate-chat`, {
                 phone: userPhone,
                 message,
                 payload
-            }, { timeout: 3000 });
+            }, { timeout: 4000 });
         } catch (e) {}
     }
 
