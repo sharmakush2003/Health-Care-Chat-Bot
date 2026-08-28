@@ -31,30 +31,24 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         };
     }
 
-    // Initialize or load conversation state for user
-    if (!CONVERSATION_STATES[phoneKey]) {
-        CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
-    }
-    const state = CONVERSATION_STATES[phoneKey];
-
-    // Reset flow if user sends any greeting or reset command
-    const GREETINGS = ['hi', 'hii', 'hiii', 'heyy', 'hey', 'hello', 'namaste', 'menu', 'restart', 'start', '0', 'help', 'healthcare', 'doctor', 'bot', 'khaira', 'good morning', 'good afternoon', 'good evening'];
+    // 2. Greeting / Reset Check
+    const GREETINGS = ['hi', 'hii', 'hiii', 'hie', 'hiee', 'heyy', 'hey', 'hello', 'namaste', 'menu', 'restart', 'start', '0', 'help', 'healthcare', 'doctor', 'bot', 'khaira', 'good morning', 'good afternoon', 'good evening'];
     const isGreeting = GREETINGS.some(g => text === g || text.startsWith(g + ' ') || text.startsWith(g + '!'));
 
-    if (isGreeting) {
-        state.step = 'WELCOME';
-        state.data = {};
+    // Welcome Greeting Function
+    const getWelcomeMessage = () => ({
+        type: 'TEXT',
+        text: `👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\n🩺 *Doctor-Guided Home Healthcare Services*\n----------------------------------------\nWe deliver certified nursing, physiotherapy, caretaker, and diagnostic services directly to your doorstep.\n\n📋 *HOW CAN WE HELP YOU TODAY?*\nPlease reply with a number (*1 to 7*) to select:\n\n1️⃣  *Nursing at Home*\n     └ ₹800 / visit  •  ₹1,500 / 12-hr shift\n\n2️⃣  *Caretaker at Home*\n     └ ₹1,200 / 12-hr  •  ₹2,000 / 24-hr\n\n3️⃣  *Physiotherapy at Home*\n     └ ₹900 / 45-min expert session\n\n4️⃣  *Lab Test / Sample Collection*\n     └ Starts @ ₹500  (Free home collection)\n\n5️⃣  *ECG at Home*\n     └ ₹1,100 / test (Instant digital report)\n\n6️⃣  *Full Tariff Card & Information*\n7️⃣  *Check Booking Status / Track Professional*\n----------------------------------------\n📲 *Reply with option number (1 to 7) to proceed*`
+    });
+
+    if (isGreeting || !CONVERSATION_STATES[phoneKey]) {
+        CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
+        return getWelcomeMessage();
     }
 
-    switch (state.step) {
-        case 'WELCOME': {
-            state.step = 'MAIN_MENU';
-            return {
-                type: 'TEXT',
-                text: `👋 *Welcome to Health Saathi Chatbot*\n_by AutomateX.co.in_\n\n🩺 *Doctor-Guided Home Healthcare Services*\n----------------------------------------\nWe deliver certified nursing, physiotherapy, caretaker, and diagnostic services directly to your doorstep.\n\n📋 *HOW CAN WE HELP YOU TODAY?*\nPlease reply with a number (*1 to 7*) to select:\n\n1️⃣  *Nursing at Home*\n     └ ₹800 / visit  •  ₹1,500 / 12-hr shift\n\n2️⃣  *Caretaker at Home*\n     └ ₹1,200 / 12-hr  •  ₹2,000 / 24-hr\n\n3️⃣  *Physiotherapy at Home*\n     └ ₹900 / 45-min expert session\n\n4️⃣  *Lab Test / Sample Collection*\n     └ Starts @ ₹500  (Free home collection)\n\n5️⃣  *ECG at Home*\n     └ ₹1,100 / test (Instant digital report)\n\n6️⃣  *Full Tariff Card & Information*\n7️⃣  *Check Booking Status / Track Professional*\n----------------------------------------\n📲 *Reply with option number (1 to 7) to proceed*`
-            };
-        }
+    const state = CONVERSATION_STATES[phoneKey];
 
+    switch (state.step) {
         case 'MAIN_MENU': {
             let selectedServiceId = null;
             if (payloadData && payloadData.startsWith('SERVICE_')) {
@@ -89,7 +83,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
 
             return {
                 type: 'TEXT',
-                text: `❌ *Invalid Selection*\n----------------------------------------\nPlease reply with numbers *1 to 5* to select a service, *6* for tariff card, or *7* to check booking status.`
+                text: `❌ *Invalid Selection*\n----------------------------------------\nPlease reply with numbers *1 to 5* to select a service, *6* for tariff card, or *7* to check booking status.\n\nType *hi* or *menu* anytime to restart.`
             };
         }
 
@@ -182,7 +176,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 });
 
                 // Reset state
-                CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
+                CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
 
                 const staffName = newBooking.assignedStaff ? `${newBooking.assignedStaff.name} (${newBooking.assignedStaff.phone})` : 'Allocating nearby specialist...';
 
@@ -193,7 +187,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
                 };
             }
 
-            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
+            CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
             return {
                 type: 'TEXT',
                 text: `❌ *Booking Cancelled*\n----------------------------------------\nType *menu* or *hi* anytime to start again.`
@@ -205,7 +199,7 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
             const bookings = getBookings();
             const found = bookings.find(b => b.id === bookingId || b.phone === userPhone);
 
-            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
+            CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
 
             if (found) {
                 const staff = found.assignedStaff ? `${found.assignedStaff.name} (${found.assignedStaff.phone})` : 'Under Allocation';
@@ -222,8 +216,8 @@ export function processHealthcareMessage(userPhone, messageText, payloadData = n
         }
 
         default: {
-            CONVERSATION_STATES[phoneKey] = { step: 'WELCOME', data: {} };
-            return processHealthcareMessage(userPhone, 'menu');
+            CONVERSATION_STATES[phoneKey] = { step: 'MAIN_MENU', data: {} };
+            return getWelcomeMessage();
         }
     }
 }
