@@ -288,56 +288,25 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {/* STAFF DIRECTORY ROSTER & META WEBHOOK SPEC */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Staff Roster */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                            <Users className="w-4 h-4 text-teal-600" />
-                            Verified Healthcare Staff Roster
-                        </h3>
-                        <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono font-semibold">
-                            {staff.length} Active Professionals
-                        </span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {staff.map(s => (
-                            <div key={s.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
-                                <div className="font-bold text-slate-900">{s.name}</div>
-                                <div className="text-[11px] text-teal-700 font-semibold">{s.role}</div>
-                                <div className="text-[10px] text-slate-500 font-mono">{s.phone} • Coverage: {s.location}</div>
-                            </div>
-                        ))}
-                    </div>
+            {/* FULL WIDTH VERIFIED HEALTHCARE STAFF DIRECTORY ROSTER */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                        <Users className="w-4 h-4 text-teal-600" />
+                        Verified Healthcare Staff Roster
+                    </h3>
+                    <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-mono font-semibold">
+                        {staff.length} Active Professionals
+                    </span>
                 </div>
-
-                {/* Meta Webhook Technical Spec */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-teal-600" />
-                            WhatsApp Cloud API Webhook Listener
-                        </h3>
-                        <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded border border-emerald-200">
-                            Active Listener
-                        </span>
-                    </div>
-
-                    <div className="space-y-2 font-mono text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                        <div>
-                            <span className="text-slate-400">Live Webhook Endpoint:</span>
-                            <div className="text-teal-700 font-bold break-all">https://garments-erp-bot.onrender.com/api/webhook</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    {staff.map(s => (
+                        <div key={s.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs hover:border-teal-300 transition">
+                            <div className="font-bold text-slate-900">{s.name}</div>
+                            <div className="text-[11px] text-teal-700 font-semibold">{s.role}</div>
+                            <div className="text-[10px] text-slate-500 font-mono">{s.phone} • Coverage: {s.location}</div>
                         </div>
-                        <div className="pt-2 border-t border-slate-200">
-                            <span className="text-slate-400">Verify Token:</span>
-                            <div className="text-slate-900 font-bold">automatex_copilot_token</div>
-                        </div>
-                        <div className="pt-2 border-t border-slate-200">
-                            <span className="text-slate-400">Active Bot WABA Number:</span>
-                            <div className="text-emerald-700 font-bold">+91 74250 16636 (Digify_soft)</div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div>
         </div>
